@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile Document",
+      "description": "Standardized identity model mapped with Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier matching the Auth UID." },
+        "email": { "type": "string", "format": "email", "description": "Normalized lowercase email address." },
+        "displayName": { "type": "string", "description": "Human displays name." },
+        "role": { "type": "string", "enum": ["super_admin", "agent", "client"], "description": "Access privileges level." },
+        "status": { "type": "string", "enum": ["active", "suspended", "incomplete"], "description": "Active state of account." },
+        "orgId": { "type": "string", "description": "Multitenant corporation scope identifier." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "UTC date of registration." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "UTC date of ultimate modification." },
+        "createdBy": { "type": "string", "description": "Admin UID who initially registered the account." },
+        "authUid": { "type": "string", "description": "Auth match identifier." },
+        "authCreated": { "type": "boolean", "description": "Whether auth registration in cloud succeeded." }
+      },
+      "required": ["uid", "email", "displayName", "role", "status", "orgId", "createdAt", "updatedAt", "authUid", "authCreated"]
+    },
+    "Property": {
+      "title": "Real Estate Property Document",
+      "description": "Property entry containing details, metrics of rooms, and sales states.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "System-generated unique identifier." },
+        "title": { "type": "string", "description": "Listing display heading." },
+        "description": { "type": "string", "description": "Explaining specifications." },
+        "type": { "type": "string", "enum": ["house", "apartment", "land", "commercial"], "description": "Category item." },
+        "price": { "type": "number", "description": "Listing cost in USD." },
+        "address": { "type": "string", "description": "Corporate address text." },
+        "status": { "type": "string", "enum": ["available", "reserved", "sold"], "description": "Sale status block." },
+        "bedrooms": { "type": "number", "description": "Rooms quantity." },
+        "bathrooms": { "type": "number", "description": "Baths quantity." },
+        "areaSqM": { "type": "number", "description": "Surface structure." },
+        "imageUrl": { "type": "string", "description": "Banner photo." },
+        "orgId": { "type": "string", "description": "Organization scope of the listing." },
+        "createdBy": { "type": "string", "description": "Staff account who added the property." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "description", "type", "price", "address", "status", "bedrooms", "bathrooms", "areaSqM", "imageUrl", "orgId", "createdBy", "createdAt", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "Technical Transaction Audit Log",
+      "description": "Secure record of database revisions registered straight on servers.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "action": { "type": "string", "enum": ["create", "update", "delete", "login", "logout", "access_denied", "role_changed"] },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "userEmail", "action", "details", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Database user records where userId exactly matches the corresponding Auth UID."
+    },
+    "/properties/{propertyId}": {
+      "schema": "Property",
+      "description": "Real estate listings, restricted by multi-tenant organization boundaries."
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Sovereign audit trails of DB operations, strictly readable only by super_admin accounts."
+    }
+  }
+}

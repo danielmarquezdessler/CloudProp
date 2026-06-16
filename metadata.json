@@ -1,0 +1,6 @@
+{
+  "name": "Aguad CloudProp AI Hub",
+  "description": "La central inmobiliaria de inteligencia artificial premium de Facundo Aguad. Incluye suite multi-agente, derivación y ruteo automático de leads y tasamiento predictivo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

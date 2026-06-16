@@ -1,0 +1,467 @@
+import { Router } from "express";
+import { getFirestoreAdmin } from "./admin";
+import { 
+  processIncomingMessage, 
+  getOrCreateAguadiSettings, 
+  getOrCreateWidgetConfig, 
+  logAguadiEvent 
+} from "./aguadiService";
+
+const router = Router();
+
+// Middleware to authorize authenticated agents or super_admins
+const requireAguadiStaff = async (req: any, res: any, next: any) => {
+  const callerUid = req.headers['x-user-uid'] || (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].split(' ')[1] : null);
+  if (!callerUid) {
+    return res.status(401).json({ success: false, error: "Identidad no verificada: UID ausente." });
+  }
+
+  try {
+    const db = getFirestoreAdmin();
+    const userDoc = await db.collection('users').doc(callerUid).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ success: false, error: "Perfil de usuario no encontrado en el sistema." });
+    }
+    const profile = userDoc.data();
+    if (profile?.role !== 'super_admin' && profile?.role !== 'agent') {
+      return res.status(403).json({ success: false, error: "Permiso denegado: Se requiere rol de Agente o Super Administrador." });
+    }
+
+    req.callerUid = callerUid;
+    req.callerProfile = profile;
+    next();
+  } catch (error: any) {
+    return res.status(500).json({ success: false, error: "Error de autorización de AGUADI: " + error.message });
+  }
+};
+
+/**
+ * 1. public widget configuration endpoint
+ */
+router.get("/public/widget-config", async (req, res) => {
+  const orgId = (req.query.orgId as string) || "aguad-corp";
+  try {
+    const config = await getOrCreateWidgetConfig(orgId);
+    res.json({ success: true, config });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 2. WhatsApp Webhook Verification (GET /api/aguadi/webhook)
+ * Validates the verification token with Facebook verification protocol.
+ */
+router.get("/aguadi/webhook", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || "aguad_verify_token_2026";
+
+  if (mode === "subscribe" && token === verifyToken) {
+    console.log("[AGUADI Webhook] Successfully verified webhook connection!");
+    return res.status(200).send(challenge);
+  } else {
+    console.warn("[AGUADI Webhook] Failed to verify webhook connection. Token mismatch.");
+    return res.status(403).json({ error: "Verification token mismatch" });
+  }
+});
+
+/**
+ * 3. WhatsApp Webhook Event Handler (POST /api/aguadi/webhook)
+ * Receives real incoming WhatsApp messages from FB servers.
+ */
+router.post("/aguadi/webhook", async (req, res) => {
+  const body = req.body;
+
+  try {
+    // Only accept WhatsApp Business message payload structure
+    if (body.object === "whatsapp_business_account" && body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
+      const changeValue = body.entry[0].changes[0].value;
+      const message = changeValue.messages[0];
+      const fromPhone = message.from; // Sender phone number
+      const text = message.text?.body || "";
+
+      if (text) {
+        // Run AGUADI Engine asynchronously to respond instantly to WhatsApp
+        processIncomingMessage(fromPhone, text, 'whatsapp', 'aguad-corp')
+          .then((result) => {
+            console.log(`[AGUADI Webhook] Correctly processed WhatsApp reply: "${result.reply.substring(0, 30)}..."`);
+          })
+          .catch((err) => {
+            console.error("[AGUADI Webhook] Error processing message async:", err);
+          });
+      }
+    }
+
+    // Always respond 200 OK immediately to WhatsApp headers to prevent retries
+    res.status(200).send("EVENT_RECEIVED");
+  } catch (error: any) {
+    console.error("[AGUADI Webhook] Fatal webhook error:", error);
+    res.status(500).send("FAIL");
+  }
+});
+
+/**
+ * 4. Conversational Simulator endpoint (POST /api/aguadi/simulate-incoming)
+ * Emulates an incoming WhatsApp/Widget chat message for diagnostics and review.
+ */
+router.post("/aguadi/simulate-incoming", async (req, res) => {
+  const { phone, text, channel, orgId } = req.body;
+
+  if (!phone || !text) {
+    return res.status(400).json({ success: false, error: "Número o Texto incompletos en el simulador." });
+  }
+
+  const targetChannel = channel === 'widget' ? 'widget' : 'whatsapp';
+  const targetOrg = orgId || "aguad-corp";
+
+  try {
+    const result = await processIncomingMessage(phone, text, targetChannel, targetOrg);
+    res.json({
+      success: true,
+      reply: result.reply,
+      conversationId: result.conversationId,
+      classification: result.classification,
+      leadCreatedOrUpdated: result.leadCreatedOrUpdated
+    });
+  } catch (error: any) {
+    console.error("[AGUADI Simulator] Error running chat emulators:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 5. GET Current AGUADI configuration, training, routing and templates (Multi-entity get)
+ */
+router.get("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const db = getFirestoreAdmin();
+
+  try {
+    const [settings, widget, rulesSnap, trainingSnap, templatesSnap] = await Promise.all([
+      getOrCreateAguadiSettings(orgId),
+      getOrCreateWidgetConfig(orgId),
+      db.collection('aguadi_agent_routing_rules').where('orgId', '==', orgId).get(),
+      db.collection('aguadi_training_rules').where('orgId', '==', orgId).get(),
+      db.collection('aguadi_response_templates').where('orgId', '==', orgId).get()
+    ]);
+
+    const routingRules: any[] = [];
+    rulesSnap.forEach((doc: any) => routingRules.push({ id: doc.id, ...doc.data() }));
+
+    const trainingRules: any[] = [];
+    trainingSnap.forEach((doc: any) => trainingRules.push({ id: doc.id, ...doc.data() }));
+
+    const responseTemplates: any[] = [];
+    templatesSnap.forEach((doc: any) => responseTemplates.push({ id: doc.id, ...doc.data() }));
+
+    res.json({
+      success: true,
+      settings,
+      widget,
+      routingRules,
+      trainingRules,
+      responseTemplates
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 6. SAVE AGUADI settings
+ */
+router.post("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const updates = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    const ref = db.collection('aguadi_settings').doc(orgId);
+    const updatedPayload = {
+      ...updates,
+      orgId,
+      updatedAt: new Date().toISOString(),
+      updatedBy: req.callerUid
+    };
+
+    await ref.set(updatedPayload, { merge: true });
+    await logAguadiEvent(orgId, 'message_sent', `Configuración general modificada por ${req.callerProfile.email}`);
+
+    res.json({ success: true, message: "Parámetros de AGUADI grabados correctamente.", settings: updatedPayload });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 7. SAVE widget styling config
+ */
+router.post("/aguadi/widget-config", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const updates = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    const ref = db.collection('aguadi_widget_configs').doc(orgId);
+    const updatedPayload = {
+      ...updates,
+      orgId,
+      updatedAt: new Date().toISOString()
+    };
+
+    await ref.set(updatedPayload, { merge: true });
+    await logAguadiEvent(orgId, 'message_sent', `Estilos del Widget de Chat actualizados por ${req.callerProfile.email}`);
+
+    res.json({ success: true, message: "Estilos visuales e iniciales de Widget grabados con éxito.", widget: updatedPayload });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 8. GET Conversations list (filtered by multitenant org)
+ */
+router.get("/aguadi/conversations", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const db = getFirestoreAdmin();
+
+  try {
+    const snap = await db.collection('aguadi_conversations')
+      .where('orgId', '==', orgId)
+      .orderBy('lastMessageAt', 'desc')
+      .get();
+
+    const conversations: any[] = [];
+    snap.forEach((doc: any) => conversations.push(doc.data()));
+
+    res.json({ success: true, conversations });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 9. GET Messages in a specific conversation
+ */
+router.get("/aguadi/conversations/:id/messages", requireAguadiStaff, async (req: any, res) => {
+  const convId = req.params.id;
+  const db = getFirestoreAdmin();
+
+  try {
+    const snap = await db.collection('aguadi_messages')
+      .where('conversationId', '==', convId)
+      .orderBy('timestamp', 'asc')
+      .limit(100)
+      .get();
+
+    const messages: any[] = [];
+    snap.forEach((doc: any) => messages.push(doc.data()));
+
+    res.json({ success: true, messages });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 10. GET Captured Leads
+ */
+router.get("/aguadi/leads", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const db = getFirestoreAdmin();
+
+  try {
+    const snap = await db.collection('aguadi_leads')
+      .where('orgId', '==', orgId)
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const leads: any[] = [];
+    snap.forEach((doc: any) => leads.push(doc.data()));
+
+    res.json({ success: true, leads });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 11. GET Dashboard Diagnostics: aggregate numbers, active history, daily counts
+ */
+router.get("/aguadi/metrics", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const db = getFirestoreAdmin();
+
+  try {
+    const [eventsSnap, metricsSnap, leadsSnap, convsSnap] = await Promise.all([
+      db.collection('aguadi_events').where('orgId', '==', orgId).orderBy('timestamp', 'desc').limit(50).get(),
+      db.collection('aguadi_metrics_daily').where('orgId', '==', orgId).orderBy('date', 'desc').limit(15).get(),
+      db.collection('aguadi_leads').where('orgId', '==', orgId).get(),
+      db.collection('aguadi_conversations').where('orgId', '==', orgId).get()
+    ]);
+
+    const events: any[] = [];
+    eventsSnap.forEach((doc: any) => events.push(doc.data()));
+
+    const metricsDaily: any[] = [];
+    metricsSnap.forEach((doc: any) => metricsDaily.push(doc.data()));
+
+    const totalLeads = leadsSnap.size;
+    const totalConversations = convsSnap.size;
+
+    let calificadosCount = 0;
+    let scoreSum = 0;
+    leadsSnap.forEach((doc: any) => {
+      const data = doc.data();
+      if (data.status === 'calificado') calificadosCount++;
+      scoreSum += Number(data.score) || 0;
+    });
+
+    res.json({
+      success: true,
+      summary: {
+        totalLeads,
+        totalConversations,
+        qualifiedLeads: calificadosCount,
+        averageLeadScore: totalLeads > 0 ? Math.round(scoreSum / totalLeads) : 0
+      },
+      events,
+      metricsDaily
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 12. CRUD Endpoints: AGENT ROUTING RULES
+ */
+router.post("/aguadi/routing-rules/save", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const { id, criteriaType, criteriaValue, assignedAgentId, isActive, priority, name } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    const ruleId = id || db.collection('aguadi_agent_routing_rules').doc().id;
+    const ref = db.collection('aguadi_agent_routing_rules').doc(ruleId);
+    
+    const rulePayload = {
+      ruleId,
+      orgId,
+      name: name || `Regla de ${criteriaType}`,
+      criteriaType,
+      criteriaValue,
+      assignedAgentId,
+      isActive: isActive !== false,
+      priority: Number(priority) || 0,
+      updatedAt: new Date().toISOString()
+    };
+
+    await ref.set(rulePayload, { merge: true });
+    await logAguadiEvent(orgId, 'lead_routed', `Regla de ruteo "${rulePayload.name}" guardada por ${req.callerProfile.email}`);
+
+    res.json({ success: true, message: "Regla de ruteo guardada con éxito.", rule: rulePayload });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post("/aguadi/routing-rules/delete", requireAguadiStaff, async (req: any, res) => {
+  const { id } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    if (!id) return res.status(400).json({ success: false, error: "ID de regla faltante." });
+    await db.collection('aguadi_agent_routing_rules').doc(id).delete();
+    res.json({ success: true, message: "Regla eliminada exitosamente." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 13. CRUD Endpoints: TRAINING GUIDELINES (AI instruction injections)
+ */
+router.post("/aguadi/training-rules/save", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const { id, keywordOrTopic, customGuideline, isActive } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    const ruleId = id || db.collection('aguadi_training_rules').doc().id;
+    const ref = db.collection('aguadi_training_rules').doc(ruleId);
+    
+    const trainingPayload = {
+      ruleId,
+      orgId,
+      keywordOrTopic,
+      customGuideline,
+      isActive: isActive !== false,
+      updatedAt: new Date().toISOString()
+    };
+
+    await ref.set(trainingPayload, { merge: true });
+    res.json({ success: true, message: "Directriz de entrenamiento IA grabada con éxito.", rule: trainingPayload });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post("/aguadi/training-rules/delete", requireAguadiStaff, async (req: any, res) => {
+  const { id } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    if (!id) return res.status(400).json({ success: false, error: "ID de directriz requerido." });
+    await db.collection('aguadi_training_rules').doc(id).delete();
+    res.json({ success: true, message: "Directriz eliminada de forma exitosa." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 14. CRUD Endpoints: CUSTOM RESPONSE TEMPLATES
+ */
+router.post("/aguadi/response-templates/save", requireAguadiStaff, async (req: any, res) => {
+  const orgId = req.callerProfile.orgId || "aguad-corp";
+  const { id, title, category, text } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    const templateId = id || db.collection('aguadi_response_templates').doc().id;
+    const ref = db.collection('aguadi_response_templates').doc(templateId);
+    
+    const templatePayload = {
+      templateId,
+      orgId,
+      title,
+      category,
+      text,
+      updatedAt: new Date().toISOString()
+    };
+
+    await ref.set(templatePayload, { merge: true });
+    res.json({ success: true, message: "Plantilla institucional registrada con éxito.", template: templatePayload });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post("/aguadi/response-templates/delete", requireAguadiStaff, async (req: any, res) => {
+  const { id } = req.body;
+  const db = getFirestoreAdmin();
+
+  try {
+    if (!id) return res.status(400).json({ success: false, error: "ID de plantilla faltante." });
+    await db.collection('aguadi_response_templates').doc(id).delete();
+    res.json({ success: true, message: "Plantilla institucional borrada con éxito." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+export default router;
