@@ -1,85 +1,105 @@
-import admin from 'firebase-admin';
-import fs from 'fs';
-import path from 'path';
+﻿import fs from "fs";
+import path from "path";
+import {
+  applicationDefault,
+  getApp,
+  getApps,
+  initializeApp,
+  type App
+} from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
-let adminApp: any = null;
+let adminApp: App | null = null;
+
+type FirebaseAppletConfig = {
+  projectId?: string;
+  firestoreDatabaseId?: string;
+};
 
 /**
- * Initializes and returns the Firebase Admin App instance.
- * Automatically falls back to local or applicationDefault credentials.
+ * Reads optional local Firebase config generated/exported with the project.
+ * This file must never contain secrets.
  */
-export function getFirebaseAdmin(): any {
-  if (!adminApp) {
-    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-    if (!fs.existsSync(configPath)) {
-      console.warn("[Firebase Admin] Configuration file 'firebase-applet-config.json' not found. Trying default initialization.");
-      try {
-        adminApp = (admin as any).initializeApp();
-      } catch (err: any) {
-        if (err.code === 'app/duplicate-app') {
-          adminApp = (admin as any).app();
-        } else {
-          throw err;
-        }
-      }
-    } else {
-      try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-        
-        let credentialOption: any = null;
-        try {
-          credentialOption = (admin as any).credential?.applicationDefault();
-        } catch (credErr) {
-          console.warn("[Firebase Admin] unable to fetch applicationDefault credentials: using default configuration.");
-        }
+function readFirebaseAppletConfig(): FirebaseAppletConfig {
+  const configPath = path.join(process.cwd(), "firebase-applet-config.json");
 
-        adminApp = (admin as any).initializeApp({
-          credential: credentialOption || undefined,
-          projectId: config.projectId,
-          databaseURL: `https://${config.projectId}.firebaseio.com`
-        });
-        
-        console.log(`[Firebase Admin] Successfully initialized for projectId: ${config.projectId}`);
-      } catch (err) {
-        console.warn("[Firebase Admin] Standard credential initialization failed, falling back to default:", err);
-        try {
-          adminApp = (admin as any).initializeApp();
-        } catch (stdErr: any) {
-          if (stdErr.code === 'app/duplicate-app') {
-            adminApp = (admin as any).app();
-          } else {
-            console.error("[Firebase Admin] Fatal administration initialization failure", stdErr);
-            throw stdErr;
-          }
-        }
-      }
-    }
+  if (!fs.existsSync(configPath)) {
+    return {};
   }
-  return adminApp;
+
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch (error) {
+    console.warn("[Firebase Admin] Could not parse firebase-applet-config.json. Using default config.");
+    return {};
+  }
 }
 
 /**
- * Gets a Firestore Admin instance targeting the custom databaseId.
+ * Initializes and returns the Firebase Admin App instance.
+ *
+ * Local development:
+ * - Prefer GOOGLE_APPLICATION_CREDENTIALS pointing to a service account JSON outside git.
+ * - Or use Application Default Credentials if configured.
+ *
+ * Production:
+ * - Use the runtime service account from Google Cloud/Firebase.
  */
-export function getFirestoreAdmin(): any {
-  const app = getFirebaseAdmin();
-  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-  if (fs.existsSync(configPath)) {
-    try {
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      if (config.firestoreDatabaseId) {
-        return (app as any).firestore(config.firestoreDatabaseId);
-      }
-    } catch (e) {
-      console.error("[Firebase Admin] Error parsing for custom databaseId", e);
-    }
+export function getFirebaseAdmin(): App {
+  if (adminApp) {
+    return adminApp;
   }
-  return (app as any).firestore();
+
+  if (getApps().length > 0) {
+    adminApp = getApp();
+    return adminApp;
+  }
+
+  const config = readFirebaseAppletConfig();
+
+  try {
+    adminApp = initializeApp({
+      credential: applicationDefault(),
+      projectId: config.projectId,
+      databaseURL: config.projectId ? `https://${config.projectId}.firebaseio.com` : undefined
+    });
+
+    console.log(
+      `[Firebase Admin] Initialized${config.projectId ? ` for projectId: ${config.projectId}` : ""}.`
+    );
+
+    return adminApp;
+  } catch (error) {
+    console.warn("[Firebase Admin] applicationDefault initialization failed. Trying default initializeApp().");
+
+    adminApp = initializeApp({
+      projectId: config.projectId,
+      databaseURL: config.projectId ? `https://${config.projectId}.firebaseio.com` : undefined
+    });
+
+    return adminApp;
+  }
+}
+
+/**
+ * Gets a Firestore Admin instance.
+ * Supports optional custom databaseId from firebase-applet-config.json.
+ */
+export function getFirestoreAdmin() {
+  const app = getFirebaseAdmin();
+  const config = readFirebaseAppletConfig();
+
+  if (config.firestoreDatabaseId) {
+    return getFirestore(app, config.firestoreDatabaseId);
+  }
+
+  return getFirestore(app);
 }
 
 /**
  * Gets an Auth Admin instance.
  */
-export function getAuthAdmin(): any {
-  return getFirebaseAdmin().auth();
+export function getAuthAdmin() {
+  return getAuth(getFirebaseAdmin());
 }

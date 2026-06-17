@@ -1,141 +1,71 @@
-rules_version = '2';
+﻿rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // --- PILAR 3: GLOBAL SAFETY NET ---
-    match /{document=**} {
-      allow read, write: if false;
-    }
 
-    // --- REUSABLE SECURITY HIGHLIGHTS (Pillars 1, 2 & 3) ---
-    
     function isSignedIn() {
       return request.auth != null;
     }
-    
-    function isEmailVerified() {
-      // Mandating verified email for standard admin writes (Pillar 8)
-      return isSignedIn() && request.auth.token.email_verified == true;
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
     }
 
-    function getUserData(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data;
+    function isSuperAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "super_admin"
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == "active";
     }
 
-    function getUserRole(uid) {
-      return getUserData(uid).role;
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isSuperAdmin();
+
+      allow create, update, delete: if false;
     }
 
-    function getUserOrg(uid) {
-      return getUserData(uid).orgId;
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
-    }
-
-    // --- PILAR 6: PII ISOLATION & COLLECTION RULES ---
-    
-    match /users/{userId} {
-      // Validate string keys
-      allow get: if isSignedIn() && isValidId(userId) && (
-        request.auth.uid == userId || 
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-      
-      // secure query scraping
-      allow list: if isSignedIn() && (
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-
-      // Rule 4/6: Block users from self-promoting roles or creating shadow accounts
-      allow create: if isSignedIn() && isValidId(userId) && (
-        getUserRole(request.auth.uid) == 'super_admin' &&
-        request.resource.data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'status', 'orgId', 'createdAt', 'updatedAt']) &&
-        request.resource.data.role in ['super_admin', 'agent', 'client']
-      );
-
-      allow update: if isSignedIn() && isValidId(userId) && (
-        // Self-Update: ONLY allow changing displayName, other fields are locked! (Pillar 4 / Rule 6)
-        (request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'updatedAt'])) ||
-        // Superadmin: Can change status, role, display name except immutable fields (Pillar 4 / Rule 6)
-        (getUserRole(request.auth.uid) == 'super_admin' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'role', 'status', 'updatedAt']))
-      );
-
-      // Permanently Delete (Rule 5)
-      allow delete: if isSignedIn() && isValidId(userId) && (
-        getUserRole(request.auth.uid) == 'super_admin' && 
-        request.auth.uid != userId // Blocks self deletion
-      );
-    }
-
-    // --- ORGANIZATIONS COLLECTION ---
     match /organizations/{orgId} {
-      allow get: if isSignedIn() && isValidId(orgId) && (
-        getUserOrg(request.auth.uid) == orgId ||
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-      allow list: if isSignedIn() && (
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-      allow write: if isSignedIn() && isValidId(orgId) && (
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-    }
-
-    // --- PILAR 11: MULTITENANCY & PROPERTIES ---
-
-    match /properties/{propertyId} {
-      // Read access: Must be signed in AND belong to the same multitenant org as the listing
-      allow get: if isSignedIn() && isValidId(propertyId) && (
-        resource.data.orgId == getUserOrg(request.auth.uid)
-      );
-
-      allow list: if isSignedIn() && (
-        resource.data.orgId == getUserOrg(request.auth.uid)
-      );
-
-      // Write permissions: Reserved for super_admin & agents of the exact same corporation
-      allow create: if isSignedIn() && isValidId(propertyId) && (
-        (getUserRole(request.auth.uid) == 'super_admin' || getUserRole(request.auth.uid) == 'agent') &&
-        request.resource.data.orgId == getUserOrg(request.auth.uid) &&
-        request.resource.data.createdBy == request.auth.uid &&
-        request.resource.data.price > 0 &&
-        request.resource.data.areaSqM > 0
-      );
-
-      allow update: if isSignedIn() && isValidId(propertyId) && (
-        (getUserRole(request.auth.uid) == 'super_admin' || getUserRole(request.auth.uid) == 'agent') &&
-        resource.data.orgId == getUserOrg(request.auth.uid) &&
-        request.resource.data.orgId == resource.data.orgId &&
-        // Block changing system metadata fields like id, createdBy, createdAt (Pillar 4)
-        request.resource.data.diff(resource.data).affectedKeys().hasAll(['title', 'description', 'type', 'price', 'address', 'status', 'bedrooms', 'bathrooms', 'areaSqM', 'imageUrl', 'updatedAt'])
-      );
-
-      allow delete: if isSignedIn() && isValidId(propertyId) && (
-        getUserRole(request.auth.uid) == 'super_admin' &&
-        resource.data.orgId == getUserOrg(request.auth.uid)
-      );
-    }
-
-    // --- PILAR 17: SYSTEM AUDIT TRAILS (Sovereign write path) ---
-
-    match /auditLogs/{logId} {
-      // Read trails: strictly limited to active super_admin audits
-      allow get, list: if isSignedIn() && isValidId(logId) && (
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-
-      // Write trials: strictly blocked for clients, generated only via servers or functions
-      allow write: if false; 
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
     match /audit_logs/{logId} {
-      allow get, list: if isSignedIn() && isValidId(logId) && (
-        getUserRole(request.auth.uid) == 'super_admin'
-      );
-      allow write: if false; 
+      allow read: if isSuperAdmin();
+      allow write: if false;
+    }
+
+    match /properties/{propertyId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /aguadi_settings/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /aguadi_conversations/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /aguadi_messages/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /aguadi_leads/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /aguadi_widget_configs/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

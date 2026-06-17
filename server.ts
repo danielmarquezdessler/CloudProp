@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -59,7 +59,7 @@ async function startServer() {
   const requireAuth = (req: any, res: any, next: any) => {
     const callerUid = req.headers['x-user-uid'] || (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].split(' ')[1] : null);
     if (!callerUid) {
-      return res.status(401).json({ success: false, error: "Infracción de seguridad: no se ha proporcionado UID de sesión." });
+      return res.status(401).json({ success: false, error: "InfracciÃ³n de seguridad: no se ha proporcionado UID de sesiÃ³n." });
     }
     req.callerUid = callerUid;
     next();
@@ -73,19 +73,19 @@ async function startServer() {
   app.post("/api/ai/generate-ficha", requireAuth, async (req: any, res) => {
     const { title, price, address, bedrooms, bathrooms, areaSqM, description } = req.body;
     if (!title || !price || !address) {
-      return res.status(400).json({ success: false, error: "Datos insuficientes para generar la ficha (Título, precio y dirección requeridos)." });
+      return res.status(400).json({ success: false, error: "Datos insuficientes para generar la ficha (TÃ­tulo, precio y direcciÃ³n requeridos)." });
     }
     try {
       const ai = getAI();
       const prompt = `
-Eres un redactor inmobiliario de élite trabajando para 'Facundo Aguad Bienes Raíces' (Tucumán, Argentina). Tu tarea es crear una ficha técnica y descripción de alta conversión para las redes sociales y portal de la siguiente propiedad:
+Eres un redactor inmobiliario de Ã©lite trabajando para 'Facundo Aguad Bienes RaÃ­ces' (TucumÃ¡n, Argentina). Tu tarea es crear una ficha tÃ©cnica y descripciÃ³n de alta conversiÃ³n para las redes sociales y portal de la siguiente propiedad:
 Propiedad: ${title}
 Precio: USD ${price}
-Ubicación: ${address}
-Características: ${bedrooms || 0} dorms, ${bathrooms || 0} baños, ${areaSqM || 0} m2.
-Detalles: ${description || 'Sin descripción adicional'}.
+UbicaciÃ³n: ${address}
+CaracterÃ­sticas: ${bedrooms || 0} dorms, ${bathrooms || 0} baÃ±os, ${areaSqM || 0} m2.
+Detalles: ${description || 'Sin descripciÃ³n adicional'}.
 
-Crea una redacción sumamente atractiva y profesional dividida en 3 secciones en base al idioma claramente etiquetadas con banderas y emojis: Español (ES 🇦🇷), Inglés (EN 🇬🇧) y Portugués (PT 🇧🇷). Destaca el estilo de vida, la luminosidad, la ubicación táctica, y añade un gancho de venta (Call to action) con emojis inmobiliarios.
+Crea una redacciÃ³n sumamente atractiva y profesional dividida en 3 secciones en base al idioma claramente etiquetadas con banderas y emojis: EspaÃ±ol (ES ðŸ‡¦ðŸ‡·), InglÃ©s (EN ðŸ‡¬ðŸ‡§) y PortuguÃ©s (PT ðŸ‡§ðŸ‡·). Destaca el estilo de vida, la luminosidad, la ubicaciÃ³n tÃ¡ctica, y aÃ±ade un gancho de venta (Call to action) con emojis inmobiliarios.
       `.trim();
 
       const response = await ai.models.generateContent({
@@ -104,27 +104,27 @@ Crea una redacción sumamente atractiva y profesional dividida en 3 secciones en
   app.post("/api/ai/analyze-lead", requireAuth, async (req: any, res) => {
     const { message } = req.body;
     if (!message) {
-      return res.status(400).json({ success: false, error: "Requerimiento de conversación vacío." });
+      return res.status(400).json({ success: false, error: "Requerimiento de conversaciÃ³n vacÃ­o." });
     }
     try {
       const ai = getAI();
       const systemInstruction = `
-Actúa como un motor de análisis cognitivo avanzado para 'Facundo Aguad Bienes Raíces'.
-Deberás procesar el requerimiento o mensaje directo del potencial cliente, extraer y clasificar los datos clave con precisión predictiva.
-Debes retornar estrictamente un JSON válido con esta estructura:
+ActÃºa como un motor de anÃ¡lisis cognitivo avanzado para 'Facundo Aguad Bienes RaÃ­ces'.
+DeberÃ¡s procesar el requerimiento o mensaje directo del potencial cliente, extraer y clasificar los datos clave con precisiÃ³n predictiva.
+Debes retornar estrictamente un JSON vÃ¡lido con esta estructura:
 {
-  "name": "Nombre extraído o 'No identificado'",
-  "phone": "Teléfono o 'No provisto'",
+  "name": "Nombre extraÃ­do o 'No identificado'",
+  "phone": "TelÃ©fono o 'No provisto'",
   "operationType": "compra" | "venta" | "alquiler" | "otro",
   "propertyType": "casa" | "departamento" | "terreno" | "comercial" | "otro",
   "zone": "Yerba Buena, Barrio Norte, Centro, etc. o 'No especificada'",
   "budget": "Presupuesto o 'No definido'",
-  "temp": "Fría" | "Tibia" | "Caliente",
+  "temp": "FrÃ­a" | "Tibia" | "Caliente",
   "score": 0 a 100,
-  "summary": "Resumen conciso del lead de un párrafo rápido",
-  "nextStep": "Guía táctica para el agente de venta"
+  "summary": "Resumen conciso del lead de un pÃ¡rrafo rÃ¡pido",
+  "nextStep": "GuÃ­a tÃ¡ctica para el agente de venta"
 }
-IMPORTANTE: Retorna únicamente el JSON válido, sin delimitadores rústicos de markdown ni textos introductorios.
+IMPORTANTE: Retorna Ãºnicamente el JSON vÃ¡lido, sin delimitadores rÃºsticos de markdown ni textos introductorios.
       `.trim();
 
       const response = await ai.models.generateContent({
@@ -147,30 +147,30 @@ IMPORTANTE: Retorna únicamente el JSON válido, sin delimitadores rústicos de 
       res.json({ success: true, analysis: JSON.parse(cleaned) });
     } catch (err: any) {
       console.error("[AI Lead Coach Error]:", err);
-      res.status(500).json({ success: false, error: "Error de análisis cognitivo: " + err.message });
+      res.status(500).json({ success: false, error: "Error de anÃ¡lisis cognitivo: " + err.message });
     }
   });
 
-  // 3. AI Predictive Appraisal (Tasación)
+  // 3. AI Predictive Appraisal (TasaciÃ³n)
   app.post("/api/ai/tasar", requireAuth, async (req: any, res) => {
     const { zone, areaSqM, bedrooms, propertyType, description } = req.body;
     if (!zone || !areaSqM || !propertyType) {
-      return res.status(400).json({ success: false, error: "Parámetros de tasación incompletos (Zona, Superficie y Tipo requeridos)." });
+      return res.status(400).json({ success: false, error: "ParÃ¡metros de tasaciÃ³n incompletos (Zona, Superficie y Tipo requeridos)." });
     }
     try {
       const ai = getAI();
       const prompt = `
-Actúa como tasador inmobiliario experto en San Miguel de Tucumán y Yerba Buena (líderes del mercado en Tucumán). Realiza una estimación rápida de valor de mercado e informe de tasación para:
+ActÃºa como tasador inmobiliario experto en San Miguel de TucumÃ¡n y Yerba Buena (lÃ­deres del mercado en TucumÃ¡n). Realiza una estimaciÃ³n rÃ¡pida de valor de mercado e informe de tasaciÃ³n para:
 - Tipo de Inmueble: ${propertyType}
 - Zona/Barrio: ${zone}
 - Superficie total: ${areaSqM} m2
 - Dormitorios: ${bedrooms || 1}
 - Comentarios adicionales: ${description || 'Sin comentarios'}
 
-Genera un informe rápido de tasación en español argentino bien estructurado usando Markdown. Incluye:
+Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructurado usando Markdown. Incluye:
 1. Rango de Valor Estimado (USD de venta y AR$ de alquiler recomendados para el contexto regional actual).
-2. Justificación Técnica (Por qué vale eso basándote en la superficie y zona).
-3. Consejos de Publicación (Cómo optimizar la oferta para vender o alquilar rápido).
+2. JustificaciÃ³n TÃ©cnica (Por quÃ© vale eso basÃ¡ndote en la superficie y zona).
+3. Consejos de PublicaciÃ³n (CÃ³mo optimizar la oferta para vender o alquilar rÃ¡pido).
       `.trim();
 
       const response = await ai.models.generateContent({
@@ -181,7 +181,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
       res.json({ success: true, report: response.text });
     } catch (err: any) {
       console.error("[AI Valuation Error]:", err);
-      res.status(500).json({ success: false, error: "Error en el motor de tasación AI: " + err.message });
+      res.status(500).json({ success: false, error: "Error en el motor de tasaciÃ³n AI: " + err.message });
     }
   });
 
@@ -189,7 +189,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
   app.get("/api/auth/check-email", async (req, res) => {
     const email = req.query.email as string;
     if (!email) {
-      return res.status(400).json({ success: false, error: "El parámetro de correo electrónico es requerido." });
+      return res.status(400).json({ success: false, error: "El parÃ¡metro de correo electrÃ³nico es requerido." });
     }
     
     // Strict production isolation check
@@ -223,23 +223,23 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
           if (uidMatches) {
             consistencyStatus = 'active_user_exists';
             canCreate = false;
-            recommendedAction = "El usuario ya existe de forma completa y consistente. Inicie sesión.";
+            recommendedAction = "El usuario ya existe de forma completa y consistente. Inicie sesiÃ³n.";
           } else {
             consistencyStatus = 'uid_mismatch';
             canCreate = false;
             canRepair = true;
-            recommendedAction = "Se detectó desajuste crítico entre Auth y Base de datos. Ejecute reparación.";
+            recommendedAction = "Se detectÃ³ desajuste crÃ­tico entre Auth y Base de datos. Ejecute reparaciÃ³n.";
           }
         } else if (authExists && !firestoreExists) {
           consistencyStatus = 'auth_only';
           canCreate = false;
           canRepair = true;
-          recommendedAction = "Registro incompleto en Auth sin documento de base de datos. Requiere reparación.";
+          recommendedAction = "Registro incompleto en Auth sin documento de base de datos. Requiere reparaciÃ³n.";
         } else if (!authExists && firestoreExists) {
           consistencyStatus = 'firestore_only';
           canCreate = false;
           canRepair = true;
-          recommendedAction = "Existe perfil pero no credenciales de acceso. Requiere asignarle contraseña.";
+          recommendedAction = "Existe perfil pero no credenciales de acceso. Requiere asignarle contraseÃ±a.";
         }
 
         return res.json({
@@ -254,7 +254,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
           uid: userRecord?.uid
         });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Error en validación real de email de producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Error en validaciÃ³n real de email de producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -277,7 +277,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
     if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
       return res.status(400).json({ 
         success: false, 
-        error: "El inicio de sesión local está deshabilitado en producción. Inicie sesión directamente mediante Firebase Auth en la interfaz comercial." 
+        error: "El inicio de sesiÃ³n local estÃ¡ deshabilitado en producciÃ³n. Inicie sesiÃ³n directamente mediante Firebase Auth en la interfaz comercial." 
       });
     }
 
@@ -310,10 +310,10 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
           allowed: true,
           role: userData.role,
           redirectTo: '/dashboard',
-          reason: "Sesión autorizada correctamente vía Firestore de producción."
+          reason: "SesiÃ³n autorizada correctamente vÃ­a Firestore de producciÃ³n."
         });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Error de verificación de sesión en producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Error de verificaciÃ³n de sesiÃ³n en producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -329,7 +329,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
   app.post("/api/auth/repair", requireAuth, async (req: any, res) => {
     const { email, repairOption } = req.body;
     if (!email) {
-      return res.status(400).json({ success: false, error: "El correo es requerido para la reparación." });
+      return res.status(400).json({ success: false, error: "El correo es requerido para la reparaciÃ³n." });
     }
     
     if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
@@ -381,7 +381,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
               updatedAt: new Date().toISOString()
             });
           }
-          return res.json({ success: true, message: `Reparación exitosa: Creadas credenciales de ingreso en Auth con contraseña provisoria: ${tempPass}` });
+          return res.json({ success: true, message: `ReparaciÃ³n exitosa: Creadas credenciales de ingreso en Auth con contraseÃ±a provisoria: ${tempPass}` });
         } else if (authUser && !userDoc) {
           await dbAdm.collection('users').doc(authUser.uid).set({
             uid: authUser.uid,
@@ -395,7 +395,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
             updatedAt: new Date().toISOString(),
             authCreated: true
           });
-          return res.json({ success: true, message: "Reparación exitosa: Se recompuso el documento de perfil del usuario en Firestore." });
+          return res.json({ success: true, message: "ReparaciÃ³n exitosa: Se recompuso el documento de perfil del usuario en Firestore." });
         } else if (authUser && userDoc) {
           if (userDoc.id !== authUser.uid) {
             const data = userDoc.data();
@@ -407,12 +407,12 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
               updatedAt: new Date().toISOString()
             });
             await userDoc.ref.delete();
-            return res.json({ success: true, message: "Reparación exitosa: Se consolidó el ID de colección con UID de autenticación." });
+            return res.json({ success: true, message: "ReparaciÃ³n exitosa: Se consolidÃ³ el ID de colecciÃ³n con UID de autenticaciÃ³n." });
           }
         }
         return res.json({ success: true, message: "El usuario ya se encuentra en un estado completamente consistente." });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Fallo al ejecutar reparación de producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Fallo al ejecutar reparaciÃ³n de producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -431,10 +431,10 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (!callerDoc.exists) {
-          return res.status(403).json({ success: false, error: "Usuario de sesión inválido." });
+          return res.status(403).json({ success: false, error: "Usuario de sesiÃ³n invÃ¡lido." });
         }
         const callerData = callerDoc.data();
-        let query = dbAdm.collection('users');
+        let query: any = dbAdm.collection('users');
         if (callerData?.role !== 'super_admin') {
           query = query.where('orgId', '==', callerData?.orgId || 'aguad-bienes-raices');
         }
@@ -506,7 +506,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
           user: { uid, email: emailNorm, displayName, role, orgId: orgId || callerDoc.data().orgId || 'aguad-bienes-raices' }
         });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Fallo al crear usuario en producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Fallo al crear usuario en producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -568,7 +568,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
 
         return res.json({ success: true, message: "Usuario modificado correctamente en Firestore y Firebase Auth." });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Fallo al modificar usuario en producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Fallo al modificar usuario en producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -607,19 +607,19 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
 
         const primaryAdmin = (process.env.ADMIN_EMAIL || "webmaster@aguadbienesraices.com.ar").trim().toLowerCase();
         if (targetDoc.data()?.email === primaryAdmin || targetDoc.data()?.role === 'super_admin') {
-          return res.status(400).json({ success: false, error: "La cuenta de administración inicial y perfiles de super_admin asociados están blindados contra eliminación." });
+          return res.status(400).json({ success: false, error: "La cuenta de administraciÃ³n inicial y perfiles de super_admin asociados estÃ¡n blindados contra eliminaciÃ³n." });
         }
 
         await targetDocRef.delete();
         try {
           await authAdm.deleteUser(targetUid);
         } catch (e: any) {
-          console.warn("[Auth Sync Warn] El usuario no existía o no pudo borrarse de Auth:", e.message);
+          console.warn("[Auth Sync Warn] El usuario no existÃ­a o no pudo borrarse de Auth:", e.message);
         }
 
         return res.json({ success: true, message: "Usuario removido correctamente de Firestore y Firebase Auth." });
       } catch (err: any) {
-        return res.status(500).json({ success: false, error: "Fallo al eliminar usuario en producción: " + err.message });
+        return res.status(500).json({ success: false, error: "Fallo al eliminar usuario en producciÃ³n: " + err.message });
       }
     } else {
       try {
@@ -641,7 +641,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         const dbAdm = getFirestoreAdmin();
         const userDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (!userDoc.exists) {
-          return res.status(403).json({ success: false, error: "ID de usuario de producción inválido." });
+          return res.status(403).json({ success: false, error: "ID de usuario de producciÃ³n invÃ¡lido." });
         }
         const userData = userDoc.data();
         const orgId = userData?.orgId || 'aguad-bienes-raices';
@@ -667,7 +667,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (!callerDoc.exists) {
-          return res.status(403).json({ success: false, error: "Identidad inválida." });
+          return res.status(403).json({ success: false, error: "Identidad invÃ¡lida." });
         }
         const callerData = callerDoc.data();
         const propData = req.body;
@@ -719,14 +719,14 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (callerDoc.data()?.role !== 'super_admin' && propDoc.data()?.orgId !== callerDoc.data()?.orgId) {
-          return res.status(403).json({ success: false, error: "Operación de seguridad bloqueada: la propiedad pertenece al entorno multitenant de otra organización." });
+          return res.status(403).json({ success: false, error: "OperaciÃ³n de seguridad bloqueada: la propiedad pertenece al entorno multitenant de otra organizaciÃ³n." });
         }
 
         await propRef.update({
           ...updates,
           updatedAt: new Date().toISOString()
         });
-        return res.json({ success: true, message: "Propiedad modificada correctamente en Firestore de producción." });
+        return res.json({ success: true, message: "Propiedad modificada correctamente en Firestore de producciÃ³n." });
       } catch (err: any) {
         return res.status(500).json({ success: false, error: "Fallo al modificar propiedad en Firestore: " + err.message });
       }
@@ -760,11 +760,11 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         }
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (callerDoc.data()?.role !== 'super_admin' && propDoc.data()?.orgId !== callerDoc.data()?.orgId) {
-          return res.status(403).json({ success: false, error: "No tienes permisos para suprimir propiedades de otra organización." });
+          return res.status(403).json({ success: false, error: "No tienes permisos para suprimir propiedades de otra organizaciÃ³n." });
         }
 
         await propRef.delete();
-        return res.json({ success: true, message: "Propiedad eliminada correctamente de Firestore de producción." });
+        return res.json({ success: true, message: "Propiedad eliminada correctamente de Firestore de producciÃ³n." });
       } catch (err: any) {
         return res.status(500).json({ success: false, error: "Fallo al suprimir la propiedad en Firestore: " + err.message });
       }
@@ -788,7 +788,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
         if (!callerDoc.exists || callerDoc.data()?.role !== 'super_admin') {
-          return res.status(403).json({ success: false, error: "Acceso restingido. Solo un Superadministrador puede visualizar bitácoras de auditoría." });
+          return res.status(403).json({ success: false, error: "Acceso restingido. Solo un Superadministrador puede visualizar bitÃ¡coras de auditorÃ­a." });
         }
 
         const snap = await dbAdm.collection('audit_logs').orderBy('createdAt', 'desc').limit(100).get();
@@ -814,7 +814,7 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
   app.post("/api/audit-logs/record", requireAuth, async (req: any, res) => {
     const { action, details, userEmail } = req.body;
     if (!action || !details) {
-      return res.status(400).json({ success: false, error: "Falta acción o detalles." });
+      return res.status(400).json({ success: false, error: "Falta acciÃ³n o detalles." });
     }
     
     if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
@@ -867,3 +867,4 @@ Genera un informe rápido de tasación en español argentino bien estructurado u
 }
 
 startServer();
+
