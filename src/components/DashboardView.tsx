@@ -38,8 +38,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     propertiesCount: 0,
     usersCount: 0,
     logsCount: 0,
-    leadsProcessed: 28,
-    averageLeadScore: 78
+    leadsProcessed: 0,
+    averageLeadScore: 0
   });
   
   const [recentLogs, setRecentLogs] = useState<AuditLog[]>([]);
@@ -105,10 +105,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
         setStats({
           propertiesCount: validProps.length,
-          usersCount: user.role === 'super_admin' ? validUsers.length : 3,
-          logsCount: user.role === 'super_admin' ? validLogs.length : 12,
-          leadsProcessed: 42,
-          averageLeadScore: 84
+          usersCount: user.role === 'super_admin' ? validUsers.length : 0,
+          logsCount: user.role === 'super_admin' ? validLogs.length : 0,
+          leadsProcessed: 0,
+          averageLeadScore: 0
         });
 
         setRecentProperties(validProps.slice(0, 3));
@@ -353,7 +353,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                   {stats.leadsProcessed}
                 </p>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block bg-emerald-50 dark:bg-emerald-950/20 px-1.5 py-0.5 rounded w-max">
-                  IA Activa
+                  Pendiente
                 </span>
               </div>
               <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl dark:bg-slate-800 shrink-0">
@@ -371,7 +371,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                   {stats.averageLeadScore}%
                 </p>
                 <span className="text-[10px] text-rose-600 dark:text-rose-400 font-bold block bg-rose-50 dark:bg-rose-950/20 px-1.5 py-0.5 rounded w-max">
-                  Calificación Alta
+                  Sin datos
                 </span>
               </div>
               <div className="p-3 bg-rose-50 text-rose-500 rounded-2xl dark:bg-slate-800 shrink-0">

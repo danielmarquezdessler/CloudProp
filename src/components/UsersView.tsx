@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  UserPlus, 
-  Search, 
-  Mail, 
-  ShieldAlert, 
-  Trash2, 
-  RefreshCw, 
-  Check, 
+import {
+  UserPlus,
+  Search,
+  Mail,
+  ShieldAlert,
+  Trash2,
+  RefreshCw,
+  Check,
   X,
   UserCheck,
   AlertCircle,
@@ -19,7 +19,7 @@ import {
 import { User, Role, UserStatus, EmailAvailabilityResponse } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 import { db, auth } from '../firebase';
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../utils/firestoreErrorHandler';
 
 export const UsersView: React.FC = () => {
@@ -44,7 +44,6 @@ export const UsersView: React.FC = () => {
     displayName: '',
     role: 'client' as Role,
     status: 'active' as UserStatus,
-    password: ''
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
@@ -151,7 +150,6 @@ export const UsersView: React.FC = () => {
       displayName: '',
       role: 'client',
       status: 'active',
-      password: 'Password123!'
     });
     setFormError(null);
     setIsFormOpen(true);
@@ -165,7 +163,6 @@ export const UsersView: React.FC = () => {
       displayName: targetUser.displayName,
       role: targetUser.role,
       status: targetUser.status,
-      password: '' // Passwords aren't shown or modified here
     });
     setFormError(null);
     setIsFormOpen(true);
@@ -182,32 +179,17 @@ export const UsersView: React.FC = () => {
 
     if (!formData.displayName.trim()) return setFormError("El nombre es requerido.");
     if (!formData.email.trim()) return setFormError("El correo electrónico es requerido.");
-    if (formMode === 'create' && !formData.password.trim()) return setFormError("Se requiere asignar una contraseña temporal.");
+    if (formMode === 'create') {
+      setFormError("La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
+      return;
+    }
 
     setFormSubmitting(true);
 
     if (auth.currentUser) {
       try {
         if (formMode === 'create') {
-          const generatedUid = 'user-' + Math.random().toString(36).substr(2, 9);
-          const userDocRef = doc(db, 'users', generatedUid);
-          const newUser = {
-            uid: generatedUid,
-            email: formData.email.trim().toLowerCase(),
-            displayName: formData.displayName,
-            role: formData.role,
-            status: formData.status,
-            orgId: 'aguad-corp',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            authUid: generatedUid,
-            authCreated: false
-          };
-          try {
-            await setDoc(userDocRef, newUser);
-          } catch (wErr) {
-            handleFirestoreError(wErr, OperationType.CREATE, `users/${generatedUid}`);
-          }
+          throw new Error("La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
         } else {
           const userDocRef = doc(db, 'users', formData.uid);
           const updateData = {
@@ -235,16 +217,14 @@ export const UsersView: React.FC = () => {
     }
 
     try {
-      const endpoint = formMode === 'create' ? '/api/users/create' : '/api/users/update';
-      const body = formMode === 'create' 
-        ? formData 
-        : { 
-            targetUid: formData.uid, 
-            displayName: formData.displayName, 
-            email: formData.email, 
-            role: formData.role, 
-            status: formData.status 
-          };
+      const endpoint = '/api/users/update';
+      const body = {
+        targetUid: formData.uid,
+        displayName: formData.displayName,
+        email: formData.email,
+        role: formData.role,
+        status: formData.status
+      };
 
       const res = await apiFetch(endpoint, {
         method: 'POST',
@@ -405,7 +385,7 @@ export const UsersView: React.FC = () => {
                   <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Email analizado:</span>
                   <p className="font-bold text-slate-700 dark:text-slate-300 word-break">{checkResult.email}</p>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2 text-[10px] bg-white p-2.5 rounded-lg border border-slate-50 dark:bg-slate-900 dark:border-slate-800">
                   <div className="flex items-center space-x-1">
                     {checkResult.authExists ? <Check className="w-3.5 h-3.5 text-teal-500 shrink-0" /> : <X className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
@@ -424,14 +404,14 @@ export const UsersView: React.FC = () => {
                     checkResult.consistencyStatus === 'active_user_exists' ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/20' :
                     'bg-amber-50 text-amber-600 dark:bg-amber-950/20'
                   }`}>
-                    {checkResult.consistencyStatus === 'available' ? t.users.statuses.active : 
-                     checkResult.consistencyStatus === 'active_user_exists' ? "ACTIVO COMPLETO" : 
+                    {checkResult.consistencyStatus === 'available' ? t.users.statuses.active :
+                     checkResult.consistencyStatus === 'active_user_exists' ? "ACTIVO COMPLETO" :
                      "INCONSISTENCIA / HUÉRFANO"}
                   </div>
                 </div>
 
                 <p className="text-[10px] text-slate-500 leading-normal">
-                  <strong className="text-slate-700 dark:text-slate-300 font-bold block">Acción recomendada:</strong> 
+                  <strong className="text-slate-700 dark:text-slate-300 font-bold block">Acción recomendada:</strong>
                   {checkResult.recommendedAction}
                 </p>
 
@@ -522,8 +502,8 @@ export const UsersView: React.FC = () => {
                             onClick={() => handleTriggerDelete(u.uid)}
                             disabled={u.uid === user.uid}
                             className={`p-1.5 rounded-lg transition-colors ${
-                              u.uid === user.uid 
-                                ? 'text-slate-300 cursor-not-allowed dark:text-slate-700' 
+                              u.uid === user.uid
+                                ? 'text-slate-300 cursor-not-allowed dark:text-slate-700'
                                 : 'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20'
                             }`}
                             title={u.uid === user.uid ? "No te puedes auto-eliminar" : "Eliminar permanentemente"}
@@ -545,7 +525,7 @@ export const UsersView: React.FC = () => {
       {/* --- USER SAVE DIALOG: CREATE & EDIT (Rule 4 / 6 / 15) --- */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div 
+          <div
             className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 dark:bg-slate-900 dark:border-slate-800"
             id="user-form-modal"
           >
@@ -554,7 +534,7 @@ export const UsersView: React.FC = () => {
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-tight">
                 {formMode === 'create' ? t.users.add_new : "Modificar Perfil de Usuario"}
               </h3>
-              <button 
+              <button
                 onClick={() => setIsFormOpen(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-800"
               >
@@ -564,6 +544,13 @@ export const UsersView: React.FC = () => {
 
             {/* Form */}
             <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
+              {formMode === 'create' && (
+                <div className="bg-amber-50 border border-amber-100 text-amber-800 p-4 rounded-xl flex items-center space-x-3 text-xs">
+                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                  <span className="font-semibold">La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.</span>
+                </div>
+              )}
+
               {formError && (
                 <div className="bg-rose-50 border border-rose-100 text-rose-800 p-4 rounded-xl flex items-center space-x-3 text-xs">
                   <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
@@ -576,8 +563,8 @@ export const UsersView: React.FC = () => {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                   {t.users.form.name}
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="displayName"
                   value={formData.displayName}
                   onChange={handleFormInputChange}
@@ -592,8 +579,8 @@ export const UsersView: React.FC = () => {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                   {t.users.form.email}
                 </label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   name="email"
                   value={formData.email}
                   disabled={formMode === 'edit'} // Lock email during edits to preserve consistency
@@ -604,30 +591,12 @@ export const UsersView: React.FC = () => {
                 />
               </div>
 
-              {/* Password temporary (Only for creations) */}
-              {formMode === 'create' && (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                    {t.users.form.password}
-                  </label>
-                  <input 
-                    type="text" 
-                    name="password"
-                    value={formData.password}
-                    onChange={handleFormInputChange}
-                    placeholder="Password123!"
-                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 dark:bg-slate-800 dark:border-slate-800 dark:text-slate-100"
-                    required
-                  />
-                </div>
-              )}
-
               {/* Role technical selection (Rule 10) */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                   {t.users.form.role}
                 </label>
-                <select 
+                <select
                   name="role"
                   value={formData.role}
                   onChange={handleFormInputChange}
@@ -644,7 +613,7 @@ export const UsersView: React.FC = () => {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                   {t.users.form.status}
                 </label>
-                <select 
+                <select
                   name="status"
                   value={formData.status}
                   onChange={handleFormInputChange}
