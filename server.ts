@@ -24,7 +24,11 @@ import aguadiRoutes from "./server/firebase/aguadiRoutes";
 import { getFirestoreAdmin, getAuthAdmin } from "./server/firebase/admin";
 import { getPropertiesFromFirestore } from "./server/firebase/firestore";
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const USE_FIREBASE_BACKEND =
+  process.env.NODE_ENV === "production" ||
+  !!process.env.K_SERVICE ||
+  process.env.USE_FIREBASE_EMULATOR === "true";
 
 let aiInstance: GoogleGenAI | null = null;
 function getAI() {
@@ -193,7 +197,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
     }
     
     // Strict production isolation check
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const authAdm = getAuthAdmin();
         const dbAdm = getFirestoreAdmin();
@@ -274,7 +278,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
     }
     
     // Login endpoints are strictly disabled on servers under production
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       return res.status(400).json({ 
         success: false, 
         error: "El inicio de sesiÃ³n local estÃ¡ deshabilitado en producciÃ³n. Inicie sesiÃ³n directamente mediante Firebase Auth en la interfaz comercial." 
@@ -294,7 +298,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // Auth: Resolve user session details
   app.get("/api/auth/session", requireAuth, async (req: any, res) => {
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const userDoc = await dbAdm.collection('users').doc(req.callerUid).get();
@@ -332,7 +336,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "El correo es requerido para la reparaciÃ³n." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const authAdm = getAuthAdmin();
         const dbAdm = getFirestoreAdmin();
@@ -357,32 +361,15 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
         }
 
         if (!authUser && userDoc) {
-          const tempPass = "TempPass123!";
-          const createdAuth = await authAdm.createUser({
-            email: emailNorm,
-            password: tempPass,
-            displayName: userDoc.data().displayName
+          return res.status(409).json({
+            success: false,
+            error: "Perfil sin credenciales detectado. Por seguridad no se crean usuarios Auth con contraseñas temporales hardcodeadas; use un flujo backend seguro de Firebase Admin SDK con credencial provista por canal seguro."
           });
-          
-          if (userDoc.id !== createdAuth.uid) {
-            const data = userDoc.data();
-            await dbAdm.collection('users').doc(createdAuth.uid).set({
-              ...data,
-              uid: createdAuth.uid,
-              authUid: createdAuth.uid,
-              authCreated: true,
-              updatedAt: new Date().toISOString()
-            });
-            await userDoc.ref.delete();
-          } else {
-            await userDoc.ref.update({
-              authUid: createdAuth.uid,
-              authCreated: true,
-              updatedAt: new Date().toISOString()
-            });
-          }
-          return res.json({ success: true, message: `ReparaciÃ³n exitosa: Creadas credenciales de ingreso en Auth con contraseÃ±a provisoria: ${tempPass}` });
         } else if (authUser && !userDoc) {
+          const callerOrgId = callerDoc.data().orgId;
+          if (!callerOrgId) {
+            return res.status(400).json({ success: false, error: "Falta orgId en el perfil administrador autenticado. No se usará fallback de organización." });
+          }
           await dbAdm.collection('users').doc(authUser.uid).set({
             uid: authUser.uid,
             authUid: authUser.uid,
@@ -390,7 +377,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
             displayName: authUser.displayName || 'Usuario Recuperado',
             role: 'client',
             status: 'active',
-            orgId: callerDoc.data().orgId || 'aguad-bienes-raices',
+            orgId: callerOrgId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             authCreated: true
@@ -426,7 +413,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // Users: Get all users
   app.get("/api/users", requireAuth, async (req: any, res) => {
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
@@ -436,7 +423,10 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
         const callerData = callerDoc.data();
         let query: any = dbAdm.collection('users');
         if (callerData?.role !== 'super_admin') {
-          query = query.where('orgId', '==', callerData?.orgId || 'aguad-bienes-raices');
+          if (!callerData?.orgId) {
+            return res.status(400).json({ success: false, error: "Falta orgId en el perfil autenticado. No se usará fallback de organización." });
+          }
+          query = query.where('orgId', '==', callerData.orgId);
         }
         const snap = await query.get();
         const list: any[] = [];
@@ -464,7 +454,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "Existen campos mandatorios incompletos." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const authAdm = getAuthAdmin();
@@ -483,6 +473,12 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
         const uid = authUser.uid;
         const nowStr = new Date().toISOString();
 
+        const callerOrgId = callerDoc.data().orgId;
+        const targetOrgId = orgId || callerOrgId;
+        if (!targetOrgId) {
+          return res.status(400).json({ success: false, error: "Falta orgId para el usuario a crear. No se usará fallback de organización." });
+        }
+
         await dbAdm.collection('users').doc(uid).set({
           uid,
           authUid: uid,
@@ -491,7 +487,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
           role,
           roleLabel: role === 'super_admin' ? 'Superadministrador' : role === 'agent' ? 'Agente de Ventas' : 'Cliente',
           status: status || 'active',
-          orgId: orgId || callerDoc.data().orgId || 'aguad-bienes-raices',
+          orgId: targetOrgId,
           permissions: role === 'super_admin' ? ["*"] : role === 'agent' ? [
             "properties.read", "properties.write", "leads.read", "leads.manage", "aguadi.view", "aguadi.conversations.read"
           ] : ["properties.read"],
@@ -503,7 +499,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
         return res.json({
           success: true,
-          user: { uid, email: emailNorm, displayName, role, orgId: orgId || callerDoc.data().orgId || 'aguad-bienes-raices' }
+          user: { uid, email: emailNorm, displayName, role, orgId: targetOrgId }
         });
       } catch (err: any) {
         return res.status(500).json({ success: false, error: "Fallo al crear usuario en producciÃ³n: " + err.message });
@@ -528,7 +524,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "El UID del destinatario es requerido." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const authAdm = getAuthAdmin();
@@ -590,7 +586,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "El UID destinatario es obligatorio." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const authAdm = getAuthAdmin();
@@ -636,7 +632,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // Properties: Read (filtered by multitenancy)
   app.get("/api/properties", requireAuth, async (req: any, res) => {
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const userDoc = await dbAdm.collection('users').doc(req.callerUid).get();
@@ -644,7 +640,10 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
           return res.status(403).json({ success: false, error: "ID de usuario de producciÃ³n invÃ¡lido." });
         }
         const userData = userDoc.data();
-        const orgId = userData?.orgId || 'aguad-bienes-raices';
+        const orgId = userData?.orgId;
+        if (!orgId) {
+          return res.status(400).json({ success: false, error: "Falta orgId en el perfil autenticado. No se usará fallback de organización." });
+        }
         const list = await getPropertiesFromFirestore(orgId);
         return res.json({ success: true, properties: list });
       } catch (err: any) {
@@ -662,7 +661,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // Properties: Create
   app.post("/api/properties/create", requireAuth, async (req: any, res) => {
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
@@ -674,10 +673,14 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
         const newId = propData.id || `prop-${Date.now()}`;
         const nowStr = new Date().toISOString();
 
+        if (!callerData?.orgId) {
+          return res.status(400).json({ success: false, error: "Falta orgId en el perfil autenticado. No se usará fallback de organización." });
+        }
+
         const payload = {
           ...propData,
           id: newId,
-          orgId: callerData?.orgId || 'aguad-bienes-raices',
+          orgId: callerData.orgId,
           createdBy: req.callerUid,
           createdAt: nowStr,
           updatedAt: nowStr
@@ -708,7 +711,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "Falta el ID de la propiedad a modificar." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const propRef = dbAdm.collection('properties').doc(id);
@@ -750,7 +753,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "ID de propiedad requerido." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const propRef = dbAdm.collection('properties').doc(id);
@@ -783,7 +786,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // Audit: Load log trails
   app.get("/api/audit-logs", requireAuth, async (req: any, res) => {
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         const callerDoc = await dbAdm.collection('users').doc(req.callerUid).get();
@@ -817,7 +820,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
       return res.status(400).json({ success: false, error: "Falta acciÃ³n o detalles." });
     }
     
-    if (process.env.NODE_ENV === "production" || process.env.USE_FIREBASE_EMULATOR === "true") {
+    if (USE_FIREBASE_BACKEND) {
       try {
         const dbAdm = getFirestoreAdmin();
         await dbAdm.collection('audit_logs').add({
@@ -844,7 +847,7 @@ Genera un informe rÃ¡pido de tasaciÃ³n en espaÃ±ol argentino bien estructu
 
   // --- VITE INTERFACE INTEGRATION ---
 
-  if (process.env.NODE_ENV !== "production") {
+  if (!USE_FIREBASE_BACKEND) {
     // Development mode
     const vite = await createViteServer({
       server: { middlewareMode: true },

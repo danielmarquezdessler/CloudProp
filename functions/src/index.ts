@@ -9,6 +9,7 @@ try {
 }
 
 const db = admin.firestore();
+const REAL_ORG_ID = 'aguad-bienes-raices';
 
 /**
  * Cloud Function 1: HTTP GET/POST ping standard verification
@@ -33,10 +34,16 @@ export const getPropertyStats = functions.https.onCall(async (data, context) => 
       'The function must be called by an authenticated user.'
     );
   }
+  if (!data.orgId) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'orgId is required. No organization fallback will be used.'
+    );
+  }
 
   try {
     const propertiesSnapshot = await db.collection('properties')
-      .where('orgId', '==', data.orgId || 'aguad-corp')
+      .where('orgId', '==', data.orgId)
       .get();
 
     let totalValuation = 0;
@@ -55,7 +62,7 @@ export const getPropertyStats = functions.https.onCall(async (data, context) => 
 
     return {
       success: true,
-      orgId: data.orgId || 'aguad-corp',
+      orgId: data.orgId,
       summary: {
         totalProperties: count,
         averagePrice: count > 0 ? (totalValuation / count) : 0,
@@ -71,7 +78,7 @@ export const getPropertyStats = functions.https.onCall(async (data, context) => 
 
 /**
  * Cloud Function 3: Auth Trigger
- * Automatically seeds the Firestore database with a new user profile when someone signs up
+ * Synchronizes a Firestore user profile when someone signs up.
  */
 export const onUserCreated = functions.auth.user().onCreate(async (user) => {
   functions.logger.info(`Auth Trigger active for user ${user.uid}`, { structuredData: true });
@@ -86,7 +93,7 @@ export const onUserCreated = functions.auth.user().onCreate(async (user) => {
       displayName: user.displayName || user.email?.split('@')[0] || 'Nuevo Usuario',
       role: 'client',
       status: 'active',
-      orgId: 'aguad-corp',
+      orgId: REAL_ORG_ID,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       authUid: user.uid,
