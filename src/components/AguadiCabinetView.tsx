@@ -164,8 +164,11 @@ export const AguadiCabinetView: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user?.orgId) {
       fetchAguadiData();
+    } else if (user) {
+      setLoading(false);
+      setErrorMsg('Falta orgId en el perfil autenticado. No se usará un fallback de organización.');
     }
   }, [user]);
 
@@ -239,6 +242,10 @@ export const AguadiCabinetView: React.FC = () => {
   // Trigger conversational simulator
   const handleSimulateIncoming = async () => {
     if (!simulatedText.trim() || !simulatedPhone.trim()) return;
+    if (!user?.orgId) {
+      setErrorMsg('Falta orgId en el perfil autenticado. No se puede simular sin organización real.');
+      return;
+    }
     try {
       setSubmitting(true);
       const res = await fetch('/api/aguadi/simulate-incoming', {
@@ -251,7 +258,7 @@ export const AguadiCabinetView: React.FC = () => {
           phone: simulatedPhone,
           text: simulatedText,
           channel: simulatedChannel,
-          orgId: user?.orgId || 'aguad-corp'
+          orgId: user?.orgId
         })
       });
 
@@ -269,7 +276,7 @@ export const AguadiCabinetView: React.FC = () => {
           // Manual construction to force render
           setSelectedConversation({
             conversationId: targetConvId,
-            orgId: user?.orgId || 'aguad-corp',
+            orgId: user?.orgId,
             contactName: data.classification?.fullName || simulatedPhone,
             contactPhone: simulatedPhone,
             channel: simulatedChannel,

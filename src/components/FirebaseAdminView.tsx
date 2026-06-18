@@ -52,7 +52,8 @@ export const FirebaseAdminView: React.FC = () => {
     setLoadingProperties(true);
     setErrorText(null);
     try {
-      const res = await apiFetch("/api/admin-firestore/properties?orgId=" + (user?.orgId || "aguad-corp"));
+      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
+      const res = await apiFetch("/api/admin-firestore/properties?orgId=" + encodeURIComponent(user.orgId));
       const data = await res.json();
       if (data.success) {
         setFirestoreProperties(data.properties || []);
@@ -87,10 +88,11 @@ export const FirebaseAdminView: React.FC = () => {
     setLoadingStats(true);
     setStatsResult(null);
     try {
+      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
       const res = await apiFetch("/api/functions/getPropertyStats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orgId: user?.orgId || "aguad-corp" })
+        body: JSON.stringify({ orgId: user?.orgId })
       });
       const data = await res.json();
       setStatsResult(data);
@@ -105,6 +107,10 @@ export const FirebaseAdminView: React.FC = () => {
   const handleSavePropertyViaAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!propTitle.trim()) return;
+    if (!user?.orgId) {
+      setErrorText("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
+      return;
+    }
     setSavingProperty(true);
     try {
       const id = "prop-admin-" + Date.now();
@@ -119,7 +125,7 @@ export const FirebaseAdminView: React.FC = () => {
         bedrooms: 3,
         bathrooms: 2,
         areaSqM: 150,
-        orgId: user?.orgId || "aguad-corp",
+        orgId: user?.orgId,
         createdBy: user?.uid || "admin-system",
         createdAt: new Date().toISOString()
       };
