@@ -13,6 +13,13 @@ import {
 
 const router = Router();
 
+const resolveRequiredOrgId = (orgId: unknown): string => {
+  if (typeof orgId !== 'string' || !orgId.trim()) {
+    throw new Error("Falta orgId. No se usará fallback de organización.");
+  }
+  return orgId.trim();
+};
+
 // Middleware to ensure standard admin authentication
 const requireAdmin = async (req: any, res: any, next: any) => {
   const callerUid = req.headers['x-user-uid'] || (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].split(' ')[1] : null);
@@ -56,10 +63,10 @@ router.get("/functions/ping", (req, res) => {
 router.post("/functions/getPropertyStats", async (req, res) => {
   const { orgId } = req.body;
   try {
-    const stats = await simulateGetPropertyStats(orgId || 'aguad-corp');
+    const stats = await simulateGetPropertyStats(resolveRequiredOrgId(orgId));
     res.json({ success: true, ...stats });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 });
 
@@ -72,7 +79,7 @@ router.post("/functions/trigger/userCreated", requireAdmin, async (req: any, res
     return res.status(400).json({ success: false, error: "Missing mandatory uid or email to simulate the trigger." });
   }
   try {
-    const result = await simulateOnUserCreatedAuthTrigger(uid, email, displayName);
+    const result = await simulateOnUserCreatedAuthTrigger(uid, email, displayName, req.callerProfile.orgId);
     // Record audit of this simulated execution
     await recordAuditInFirestore({
       userId: req.callerUid,
@@ -90,12 +97,12 @@ router.post("/functions/trigger/userCreated", requireAdmin, async (req: any, res
  * 4. Admin SDK Firestore Reader endpoint (Multitenanted)
  */
 router.get("/admin-firestore/properties", async (req, res) => {
-  const orgId = (req.query.orgId as string) || "aguad-corp";
   try {
+    const orgId = resolveRequiredOrgId(req.query.orgId);
     const list = await getPropertiesFromFirestore(orgId);
     res.json({ success: true, source: "Firebase-Admin-Firestore", properties: list });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 });
 
@@ -614,97 +621,5 @@ const handleBootstrapFirstAdmin = async (req: any, res: any) => {
 router.post("/functions/bootstrapFirstAdmin", handleBootstrapFirstAdmin);
 router.post("/bootstrapFirstAdmin", handleBootstrapFirstAdmin);
 router.post("/firebase-admin/bootstrap", handleBootstrapFirstAdmin);
-
-/**
- * 8. Clean up demo users
- */
-const handleCleanupDemoUsers = async (req: any, res: any) => {
-  const bSecret = req.body.secret || req.headers['x-bootstrap-secret'] || req.query.secret;
-  const expectedSecret = process.env.BOOTSTRAP_SECRET;
-  
-  if (!expectedSecret || bSecret !== expectedSecret) {
-    return res.status(403).json({ 
-      success: false, 
-      error: "Infracción de seguridad: BOOTSTRAP_SECRET inválido o no configurado en servidor." 
-    });
-  }
-
-  const demoEmails = [
-    "agent1@aguadbienesraices.com.ar",
-    "client1@aquaprop.com"
-  ];
-
-  const results: any[] = [];
-  const db = getFirestoreAdmin();
-  const authAdmin = getAuthAdmin();
-
-  try {
-    for (const email of demoEmails) {
-      const report: any = { 
-        email, 
-        authDeleted: false, 
-        firestoreDeleted: false, 
-        errorCount: 0 
-      };
-      
-      // Delete from Auth
-      try {
-        const authUser = await authAdmin.getUserByEmail(email);
-        if (authUser) {
-          await authAdmin.deleteUser(authUser.uid);
-          report.authDeleted = true;
-          report.uid = authUser.uid;
-        }
-      } catch (e: any) {
-        if (e.code !== 'auth/user-not-found') {
-          report.authError = e.message;
-          report.errorCount++;
-        }
-      }
-
-      // Delete from Firestore users collection
-      try {
-        const querySnap = await db.collection('users').where('email', '==', email).get();
-        if (!querySnap.empty) {
-          for (const doc of querySnap.docs) {
-            await doc.ref.delete();
-            report.firestoreDeleted = true;
-            report.uid = doc.id;
-          }
-        }
-      } catch (e: any) {
-        report.firestoreError = e.message;
-        report.errorCount++;
-      }
-
-      results.push(report);
-    }
-
-    // Write audit log
-    const nowStr = new Date().toISOString();
-    await db.collection('audit_logs').add({
-      action: "cleanup_demo_users",
-      status: "success",
-      createdAt: nowStr,
-      source: "system",
-      details: `Eliminación de usuarios de prueba procesada: ${JSON.stringify(results)}`
-    });
-
-    return res.json({
-      success: true,
-      message: "Proceso de limpieza de usuarios demo concluido con éxito.",
-      deletedSummary: results
-    });
-
-  } catch (error: any) {
-    return res.status(500).json({ 
-      success: false, 
-      error: "Error de ejecución en la limpieza de demo: " + error.message 
-    });
-  }
-};
-
-router.post("/functions/cleanupDemoUsers", handleCleanupDemoUsers);
-router.post("/cleanupDemoUsers", handleCleanupDemoUsers);
 
 export default router;

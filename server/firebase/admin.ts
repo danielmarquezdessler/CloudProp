@@ -11,6 +11,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
 let adminApp: App | null = null;
+const isProductionRuntime = () => process.env.NODE_ENV === "production" || !!process.env.K_SERVICE;
 
 type FirebaseAppletConfig = {
   projectId?: string;
@@ -70,8 +71,12 @@ export function getFirebaseAdmin(): App {
     );
 
     return adminApp;
-  } catch (error) {
-    console.warn("[Firebase Admin] applicationDefault initialization failed. Trying default initializeApp().");
+  } catch (error: any) {
+    if (isProductionRuntime()) {
+      throw new Error(`[Firebase Admin] No se pudo inicializar Firebase Admin en producción: ${error.message}`);
+    }
+
+    console.warn("[Firebase Admin] applicationDefault initialization failed in local development. Trying default initializeApp().");
 
     adminApp = initializeApp({
       projectId: config.projectId,

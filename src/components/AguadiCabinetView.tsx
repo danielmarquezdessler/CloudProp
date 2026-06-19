@@ -2322,7 +2322,7 @@ export const AguadiCabinetView: React.FC = () => {
                 <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider font-mono border ${
                   process.env.WHATSAPP_ACCESS_TOKEN ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-400'
                 }`}>
-                  {process.env.WHATSAPP_ACCESS_TOKEN ? '🚀 Conectada' : 'Simulado en Consola'}
+                  {process.env.WHATSAPP_ACCESS_TOKEN ? 'Conectada' : 'Consola local'}
                 </span>
               </div>
 

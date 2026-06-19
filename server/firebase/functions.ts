@@ -48,8 +48,11 @@ export async function simulateGetPropertyStats(orgId: string): Promise<any> {
  * Mock dispatcher of Cloud Functions triggers. 
  * Can be called manually to simulate a user registration Auth trigger.
  */
-export async function simulateOnUserCreatedAuthTrigger(uid: string, email: string, displayName?: string): Promise<any> {
+export async function simulateOnUserCreatedAuthTrigger(uid: string, email: string, displayName: string | undefined, orgId: string): Promise<any> {
   console.log(`[Cloud Functions Sim] Simulating onUserCreated auth trigger for ${uid}`);
+  if (!orgId) {
+    throw new Error("Falta orgId del perfil autenticado. No se usará fallback de organización.");
+  }
   try {
     const db = getFirestoreAdmin();
     const userRef = db.collection('users').doc(uid);
@@ -59,15 +62,14 @@ export async function simulateOnUserCreatedAuthTrigger(uid: string, email: strin
       const newUserProfile = {
         uid,
         email,
-        displayName: displayName || email.split('@')[0] || 'Nuevo Usuario Simulado',
+        displayName: displayName || email.split('@')[0] || 'Nuevo Usuario',
         role: 'client',
         status: 'active',
-        orgId: 'aguad-corp',
+        orgId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         authUid: uid,
-        authCreated: true,
-        simulatedTrigger: true
+        authCreated: true
       };
 
       await userRef.set(newUserProfile);

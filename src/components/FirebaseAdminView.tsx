@@ -37,10 +37,10 @@ export const FirebaseAdminView: React.FC = () => {
   const [statsResult, setStatsResult] = useState<any>(null);
   const [loadingStats, setLoadingStats] = useState<boolean>(false);
   
-  // Simulated Auth trigger
-  const [triggerUid, setTriggerUid] = useState<string>("test-user-" + Math.random().toString(36).substr(2, 5));
-  const [triggerEmail, setTriggerEmail] = useState<string>("simulated.user@aguad.com");
-  const [triggerName, setTriggerName] = useState<string>("Simulado Aguad");
+  // Auth trigger diagnostics
+  const [triggerUid, setTriggerUid] = useState<string>("");
+  const [triggerEmail, setTriggerEmail] = useState<string>("");
+  const [triggerName, setTriggerName] = useState<string>("");
   const [triggerResult, setTriggerResult] = useState<any>(null);
   const [triggeringAuth, setTriggeringAuth] = useState<boolean>(false);
   
@@ -103,7 +103,7 @@ export const FirebaseAdminView: React.FC = () => {
     }
   };
 
-  // Add random/mock Property using Firebase Admin SDK 
+  // Add Property using Firebase Admin SDK 
   const handleSavePropertyViaAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!propTitle.trim()) return;
@@ -174,31 +174,13 @@ export const FirebaseAdminView: React.FC = () => {
     }
   };
 
-  // Simulate onUserCreated Trigger function
+  // Auth trigger execution is intentionally disabled from the browser.
   const triggerUserCreatedSimulation = async () => {
-    setTriggeringAuth(true);
-    setTriggerResult(null);
-    try {
-      const res = await apiFetch("/api/functions/trigger/userCreated", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          uid: triggerUid,
-          email: triggerEmail,
-          displayName: triggerName
-        })
-      });
-      const data = await res.json();
-      setTriggerResult(data);
-      if (data.success) {
-        // Regenerate pre-seeded uid for next test
-        setTriggerUid("test-user-" + Math.random().toString(36).substr(2, 5));
-      }
-    } catch (err: any) {
-      setTriggerResult({ success: false, error: err.message });
-    } finally {
-      setTriggeringAuth(false);
-    }
+    setTriggeringAuth(false);
+    setTriggerResult({
+      success: false,
+      error: "La creación o simulación de usuarios desde el navegador está deshabilitada. Use backend seguro con Firebase Admin SDK."
+    });
   };
 
   useEffect(() => {
@@ -382,7 +364,7 @@ export const FirebaseAdminView: React.FC = () => {
             <Cpu className="w-5 h-5 text-purple-500" />
             <div>
               <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Ejecución y Triggers: Cloud Functions</h3>
-              <p className="text-[10px] text-slate-400 font-mono">MOCK / LIVE FUNCTION CONTROLLERS</p>
+              <p className="text-[10px] text-slate-400 font-mono">SERVER FUNCTION DIAGNOSTICS</p>
             </div>
           </div>
 
@@ -440,8 +422,8 @@ export const FirebaseAdminView: React.FC = () => {
           {/* Auth trigger test onUserCreated */}
           <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="space-y-1">
-              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase">Simular Trigger: auth().onCreate()</h4>
-              <p className="text-[10px] text-slate-400">Verifica la inicialización del Admin SDK salvando automáticamente un perfil tras login seguro.</p>
+              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase">Diagnóstico Trigger: auth().onCreate()</h4>
+              <p className="text-[10px] text-slate-400">La creación de perfiles desde navegador está bloqueada. Este panel solo informa la política vigente.</p>
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
@@ -481,7 +463,7 @@ export const FirebaseAdminView: React.FC = () => {
                 disabled={triggeringAuth}
                 className="w-full py-1.5 bg-slate-800 hover:bg-slate-750 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
-                {triggeringAuth ? "Disparando Evento..." : "Disparar Trigger de Creación"}
+                {triggeringAuth ? "Validando política..." : "Ver política de creación segura"}
               </button>
 
               {triggerResult && (
