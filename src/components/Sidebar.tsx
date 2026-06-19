@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onClose}
             className="absolute right-3 top-3 rounded-md p-1.5 text-white/70 hover:bg-white/10 hover:text-white md:hidden"
-            aria-label="Cerrar navegaciÃ³n"
+            aria-label="Cerrar navegación"
           >
             <X className="h-5 w-5" />
           </button>

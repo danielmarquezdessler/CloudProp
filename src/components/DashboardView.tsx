@@ -49,7 +49,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- INTERACTIVE TOOL 1: MULTILINGUAL PORTAL SYNTHESIZER ---
+  // --- INTERACTIVE TOOL 1: PUBLICATION SYNTHESIZER ---
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const [syncedPropertyDetails, setSyncedPropertyDetails] = useState<string>('');
   const [generatedFicha, setGeneratedFicha] = useState<string>('');
@@ -68,7 +68,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
   const [valuArea, setValuArea] = useState<number>(120);
   const [valuBeds, setValuBeds] = useState<number>(3);
   const [valuPropType, setValuPropType] = useState<string>('casa');
-  const [valuDesc, setValuDesc] = useState<string>('Excelente iluminaciÃ³n, cochera techada para 2 autos, jardÃ­n con piscina pequeÃ±a.');
+  const [valuDesc, setValuDesc] = useState<string>('Excelente iluminación, cochera techada para 2 autos, jardín con piscina pequeña.');
   const [valuReport, setValuReport] = useState<string>('');
   const [valuLoading, setValuLoading] = useState(false);
   const [valuError, setValuError] = useState<string | null>(null);
@@ -128,11 +128,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     fetchDashboardData();
   }, [user]);
 
-  // Handle Tool 1: generate multilingual brochure
+  // Handle Tool 1: generate publication copy
   const handleGenerateFicha = async () => {
     const prop = allProperties.find(p => p.id === selectedPropertyId);
     if (!prop) {
-      setFichaError("Por favor, selecciona una propiedad vÃ¡lida.");
+      setFichaError("Por favor, selecciona una propiedad válida.");
       return;
     }
 
@@ -161,10 +161,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
       if (data.success) {
         setGeneratedFicha(data.brochure);
       } else {
-        setFichaError(data.error || "OcurriÃ³ un error al compilar el folleto con IA.");
+        setFichaError(data.error || "Ocurrió un error al compilar el folleto con IA.");
       }
     } catch (err: any) {
-      setFichaError(err.message || "Fallo en la comunicaciÃ³n con el servidor de IA.");
+      setFichaError(err.message || "Fallo en la comunicación con el servidor de IA.");
     } finally {
       setFichaLoading(false);
     }
@@ -194,10 +194,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
       if (data.success) {
         setLeadAnalysis(data.analysis);
       } else {
-        setAnalysisError(data.error || "No se pudo realizar el anÃ¡lisis del lead.");
+        setAnalysisError(data.error || "No se pudo realizar el análisis del lead.");
       }
     } catch (err: any) {
-      setAnalysisError(err.message || "Fallo tÃ©cnico en la llamada al motor predictivo.");
+      setAnalysisError(err.message || "Fallo técnico en la llamada al motor predictivo.");
     } finally {
       setAnalysisLoading(false);
     }
@@ -233,10 +233,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
       if (data.success) {
         setValuReport(data.report);
       } else {
-        setValuError(data.error || "No se pudo calcular la tasaciÃ³n predictiva.");
+        setValuError(data.error || "No se pudo calcular la tasación predictiva.");
       }
     } catch (err: any) {
-      setValuError(err.message || "Error al conectar con el servidor de anÃ¡lisis regional.");
+      setValuError(err.message || "Error al conectar con el servidor de análisis regional.");
     } finally {
       setValuLoading(false);
     }
@@ -255,15 +255,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
   const leadExamples = [
     {
       label: "Comprador Yerba Buena",
-      text: "Hola! Soy MartÃ­n. Vi el anuncio del depto en Yerba Buena de 2 dorms. Tengo presupuesto de unos USD 140.000 de contado. Dejo mi celular para armar una visita: 381445522. Gracias!"
+      text: "Hola! Soy Martín. Vi el anuncio del depto en Yerba Buena de 2 dorms. Tengo presupuesto de unos USD 140.000 de contado. Dejo mi celular para armar una visita: 381445522. Gracias!"
     },
     {
       label: "Permuta / Venta Barrio Norte",
-      text: "Buenas tardes, tengo una casa residencial de 4 habitaciones en Barrio Norte que quiero tasar y vender para comprar dos deptos mÃ¡s chicos. Â¿Ustedes realizan tasaciones fÃ­sicas?"
+      text: "Buenas tardes, tengo una casa residencial de 4 habitaciones en Barrio Norte que quiero tasar y vender para comprar dos deptos más chicos. ¿Ustedes realizan tasaciones físicas?"
     },
     {
       label: "Alquiler Corporativo",
-      text: "Hola, represento a una firma extranjera. Busco un inmueble comercial amplio o casa apto oficinas por el Centro. Firmamos contrato de inmediato por 3 aÃ±os. Saludos!"
+      text: "Hola, represento a una firma extranjera. Busco un inmueble comercial amplio o casa apto oficinas por el Centro. Firmamos contrato de inmediato por 3 años. Saludos!"
     }
   ];
 
@@ -292,7 +292,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               Inmuebles & AI Control Room
             </h1>
             <p className="text-xs md:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Bienvenido, <strong className="text-teal-400 font-bold">{user.displayName}</strong>. EstÃ¡s en la plataforma integrada de inteligencia artificial inmobiliaria de <strong className="text-white">Facundo Aguad Bienes RaÃ­ces</strong>. Todas tus interacciones de lead-routing y entrenamiento estÃ¡n aseguradas de forma sÃ­ncrona.
+              Bienvenido, <strong className="text-teal-400 font-bold">{user.displayName}</strong>. Estás en la plataforma integrada de inteligencia artificial inmobiliaria de <strong className="text-white">Facundo Aguad Bienes Raíces</strong>. Todas tus interacciones de lead-routing y entrenamiento están aseguradas de forma síncrona.
             </p>
           </div>
 
@@ -408,13 +408,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               </h2>
             </div>
             <p className="text-xs text-slate-400">
-              Ejecuta flujos integrados de procesamiento sintÃ©tico en base a tu base de datos y modelos predictivos.
+              Ejecuta flujos integrados de procesamiento sintético en base a tu base de datos y modelos predictivos.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* BENTO TOOL 1: MULTILINGUAL AI BROCHURE GENERATOR */}
+            {/* BENTO TOOL 1: AI PUBLICATION COPY GENERATOR */}
             <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
@@ -423,24 +423,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                       <Globe className="w-4.5 h-4.5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-none">Sintetizador de Folletos Tri-Idioma</h3>
-                      <span className="text-[9px] text-slate-500 font-mono tracking-wider">GEMINI MULTILINGUAL BROCHURE COMPIILER</span>
+                      <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-none">Sintetizador de publicaciones</h3>
+                      <span className="text-[9px] text-slate-500 font-mono tracking-wider">REDACCIÓN INMOBILIARIA CON IA</span>
                     </div>
                   </div>
                   <span className="text-[9px] font-bold font-mono tracking-widest text-[#10b981] bg-[#10b981]/10 border border-[#10b981]/20 px-2 py-0.5 rounded-full uppercase shrink-0">
-                    LISTINGS-READY
+                    LISTO PARA PUBLICAR
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-400 mb-5 leading-relaxed">
-                  Exporta una ficha de propiedad instantÃ¡nea y de alta conversiÃ³n adaptada nativamente a <strong>EspaÃ±ol ðŸ‡¦ðŸ‡·, InglÃ©s ðŸ‡¬ðŸ‡§ y PortuguÃ©s ðŸ‡§ðŸ‡·</strong> usando la informaciÃ³n de tu cartera de inmuebles.
+                  Exportá una ficha de propiedad instantánea y de alta conversión en español Argentina usando la información de tu cartera de inmuebles.
                 </p>
 
                 {allProperties.length === 0 ? (
                   <div className="p-6 bg-slate-950/60 border border-slate-800/80 rounded-2xl text-center flex flex-col items-center justify-center space-y-1.5 py-8">
                     <Building2 className="w-8 h-8 text-slate-700" />
-                    <p className="text-xs font-semibold text-slate-400">No hay inmuebles disponibles en tu catÃ¡logo todavÃ­a.</p>
-                    <p className="text-[10px] text-slate-550">Ingresa a la secciÃ³n "Propiedades" para crear tu primer listado multitenant.</p>
+                    <p className="text-xs font-semibold text-slate-400">No hay inmuebles disponibles en tu catálogo todavía.</p>
+                    <p className="text-[10px] text-slate-550">Ingresa a la sección "Propiedades" para crear tu primer listado multitenant.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -476,7 +476,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 text-white" />
-                          <span>GENERAR PROPAGANDA MULTILENGUAJE AI</span>
+                          <span>GENERAR PUBLICACIÓN EN ESPAÑOL</span>
                         </>
                       )}
                     </button>
@@ -504,7 +504,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                         {copiedSection === 'ficha' ? (
                           <>
                             <Check className="w-3.5 h-3.5 text-teal-400" />
-                            <span className="text-teal-400">Â¡Copiado!</span>
+                            <span className="text-teal-400">¡Copiado!</span>
                           </>
                         ) : (
                           <>
@@ -542,7 +542,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 </div>
 
                 <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Pega el mensaje crudo que te enviÃ³ un cliente por redes o WhatsApp para que la IA extraiga perfiles, estime su temperatura comercial, asigne un score y dicte su prÃ³xima mejor acciÃ³n.
+                  Pega el mensaje crudo que te envió un cliente por redes o WhatsApp para que la IA extraiga perfiles, estime su temperatura comercial, asigne un score y dicte su próxima mejor acción.
                 </p>
 
                 <div className="space-y-4">
@@ -568,7 +568,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     <textarea 
                       value={rawLeadMessage}
                       onChange={(e) => setRawLeadMessage(e.target.value)}
-                      placeholder="Pega un mensaje aquÃ­ (ej: 'Hola, buenas. QuerÃ­a consultar por la casa de Yerba Buena de 3 dorms. Mi presupuesto es 180k usd, dejo mi celu 381...')"
+                      placeholder="Pega un mensaje aquí (ej: 'Hola, buenas. Quería consultar por la casa de Yerba Buena de 3 dorms. Mi presupuesto es 180k usd, dejo mi celu 381...')"
                       rows={3}
                       className="w-full p-3 text-xs bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 text-slate-200 resize-none font-sans leading-relaxed"
                     />
@@ -585,7 +585,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        <span>CORRIENDO ANÃLISIS COGNITIVO ...</span>
+                        <span>CORRIENDO ANÁLISIS COGNITIVO ...</span>
                       </>
                     ) : (
                       <>
@@ -616,7 +616,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                         leadAnalysis.temp === 'Tibia' ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' :
                         'bg-slate-800 text-slate-400'
                       }`}>
-                        TÃ©mpora: {leadAnalysis.temp}
+                        Témpora: {leadAnalysis.temp}
                       </span>
                     </div>
 
@@ -638,7 +638,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                         <span className="font-bold text-teal-300 text-xs uppercase">{leadAnalysis.propertyType}</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-slate-500 block uppercase font-mono">Zona InterÃ©s</span>
+                        <span className="text-[9px] text-slate-500 block uppercase font-mono">Zona Interés</span>
                         <span className="font-semibold text-slate-300 text-xs">{leadAnalysis.zone}</span>
                       </div>
                       <div>
@@ -667,7 +667,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     </div>
 
                     <div className="p-3 bg-teal-950/20 border border-teal-800/10 rounded-lg space-y-1 text-[11px] leading-relaxed">
-                      <strong className="text-[9px] text-teal-400 uppercase font-mono block tracking-wide">Estrategia TÃ¡ctica Sugerida</strong>
+                      <strong className="text-[9px] text-teal-400 uppercase font-mono block tracking-wide">Estrategia Táctica Sugerida</strong>
                       <p className="text-teal-300 font-medium font-sans">{leadAnalysis.nextStep}</p>
                     </div>
                   </div>
@@ -687,22 +687,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     <Scale className="w-5 h-5 text-teal-500" />
                     <div>
                       <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-tight">Tasador de Mercado Predictivo AI</h3>
-                      <span className="text-[9px] text-slate-400 font-mono uppercase block mt-0.5">ESTIMACIÃ“N DE VALOR E INFORME TÃ‰CNICO REGIONAL</span>
+                      <span className="text-[9px] text-slate-400 font-mono uppercase block mt-0.5">ESTIMACIÓN DE VALOR E INFORME TÉCNICO REGIONAL</span>
                     </div>
                   </div>
                   <span className="text-[9px] font-bold font-mono tracking-widest text-teal-600 bg-teal-50 dark:bg-teal-950/20 px-2 py-0.5 rounded-full uppercase shrink-0">
-                    TUCUMÃN / YERBA BUENA
+                    TUCUMÁN / YERBA BUENA
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
-                  Genera una tasaciÃ³n predictiva inmediata basada en las superficies residenciales medias en Yerba Buena, Barrio Norte, Centro y zonas premium del norte argentino.
+                  Genera una tasación predictiva inmediata basada en las superficies residenciales medias en Yerba Buena, Barrio Norte, Centro y zonas premium del norte argentino.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Zona */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase block font-mono">Zona GeogrÃ¡fica</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase block font-mono">Zona Geográfica</label>
                     <input 
                       type="text" 
                       value={valuZone}
@@ -729,7 +729,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
                   {/* Area */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase block font-mono">Superficie Cubierta (mÂ²)</label>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase block font-mono">Superficie Cubierta (m²)</label>
                     <input 
                       type="number" 
                       value={valuArea}
@@ -775,7 +775,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <span>COMPUTANDO VALUACIÃ“N DE MERCADO REGIONAL...</span>
+                      <span>COMPUTANDO VALUACIÓN DE MERCADO REGIONAL...</span>
                     </>
                   ) : (
                     <>
@@ -797,7 +797,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 {valuReport && (
                   <div className="mt-4 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 font-mono tracking-wide uppercase">TasaciÃ³n y Reporte Regional Generado</span>
+                      <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 font-mono tracking-wide uppercase">Tasación y Reporte Regional Generado</span>
                       <button 
                         onClick={() => handleCopyClipboard(valuReport, 'valu')}
                         className="text-[10px] font-semibold text-slate-500 hover:text-slate-800 bg-slate-50 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-100 dark:border-slate-850 px-2.5 py-1 rounded-md flex items-center space-x-1 transition cursor-pointer"
@@ -833,7 +833,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     </div>
                     <div>
                       <h3 className="text-xs font-bold text-white uppercase tracking-tight leading-none">{AGUADI_ZAP_MODULE_NAME}</h3>
-                      <span className="text-[9px] font-mono text-teal-400 font-bold block mt-0.5">ConversiÃ³n WhatsApp 24/7</span>
+                      <span className="text-[9px] font-mono text-teal-400 font-bold block mt-0.5">Conversión WhatsApp 24/7</span>
                     </div>
                   </div>
                   <span className="bg-teal-950/40 text-teal-400 border border-teal-800/60 px-2 py-0.5 text-[9px] rounded-md font-mono font-bold uppercase shrink-0">
@@ -842,7 +842,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 </div>
 
                 <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                  {AGUADI_ZAP_DISPLAY_NAME}. La actividad real aparecerÃ¡ cuando existan conversaciones, leads y eventos registrados en Firestore.
+                  {AGUADI_ZAP_DISPLAY_NAME}. La actividad real aparecerá cuando existan conversaciones, leads y eventos registrados en Firestore.
                 </p>
 
                 {/* Automation Mini-Stats */}
@@ -864,7 +864,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     <div className="flex items-center space-x-2 text-slate-300">
                       <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
                       <span className="text-slate-400 shrink-0 font-mono">--:--</span>
-                      <p className="truncate">Sin eventos reales registrados todavÃ­a.</p>
+                      <p className="truncate">Sin eventos reales registrados todavía.</p>
                     </div>
                   </div>
                 </div>
@@ -946,7 +946,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 <div className="py-12 flex flex-col items-center justify-center text-center space-y-2">
                   <ShieldAlert className="w-8 h-8 text-amber-500 opacity-60 animate-pulse" />
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-xs leading-normal">
-                    Los registros de Auditoría detallados de base de datos estÃ¡n restringidos a cuentas de nivel <strong className="text-rose-500 font-mono">super_admin</strong> por polÃ­ticas de seguridad del producto.
+                    Los registros de Auditoría detallados de base de datos están restringidos a cuentas de nivel <strong className="text-rose-500 font-mono">super_admin</strong> por políticas de seguridad del producto.
                   </p>
                 </div>
               ) : recentLogs.length === 0 ? (

@@ -78,7 +78,7 @@ export const AuditLogsView: React.FC = () => {
         <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto opacity-80 mb-3" />
         <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">{t.common.no_permission}</h3>
         <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-          La consulta de la bitÃ¡cora tÃ©cnica de transacciones requiere permisos de nivel administrativo elevados.
+          La consulta de la bitácora técnica de transacciones requiere permisos de nivel administrativo elevados.
         </p>
       </div>
     );
@@ -135,7 +135,7 @@ export const AuditLogsView: React.FC = () => {
       ) : filteredLogs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-100 p-16 text-center dark:bg-slate-900 dark:border-slate-800" id="empty-state-logs">
           <History className="w-12 h-12 text-slate-300 mx-auto opacity-70 mb-3" />
-          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1 leading-tight">{t.logs.title} vacÃ­o</h3>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1 leading-tight">{t.logs.title} vacío</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">{t.logs.subtitle}</p>
         </div>
       ) : (

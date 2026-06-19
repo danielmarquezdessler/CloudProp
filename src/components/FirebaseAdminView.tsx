@@ -52,7 +52,7 @@ export const FirebaseAdminView: React.FC = () => {
     setLoadingProperties(true);
     setErrorText(null);
     try {
-      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usarÃ¡ un fallback de organizaciÃ³n.");
+      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
       const res = await apiFetch("/api/admin-firestore/properties?orgId=" + encodeURIComponent(user.orgId));
       const data = await res.json();
       if (data.success) {
@@ -88,7 +88,7 @@ export const FirebaseAdminView: React.FC = () => {
     setLoadingStats(true);
     setStatsResult(null);
     try {
-      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usarÃ¡ un fallback de organizaciÃ³n.");
+      if (!user?.orgId) throw new Error("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
       const res = await apiFetch("/api/functions/getPropertyStats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,7 +108,7 @@ export const FirebaseAdminView: React.FC = () => {
     e.preventDefault();
     if (!propTitle.trim()) return;
     if (!user?.orgId) {
-      setErrorText("Falta orgId en el perfil autenticado. No se usarÃ¡ un fallback de organizaciÃ³n.");
+      setErrorText("Falta orgId en el perfil autenticado. No se usará un fallback de organización.");
       return;
     }
     setSavingProperty(true);
@@ -117,10 +117,10 @@ export const FirebaseAdminView: React.FC = () => {
       const payload: Partial<Property> & { id: string } = {
         id,
         title: propTitle.trim(),
-        description: "Creado desde la Suite de AdministraciÃ³n utilizando el Firebase Admin SDK.",
+        description: "Creado desde la Suite de Administración utilizando el Firebase Admin SDK.",
         type: propType,
         price: Number(propPrice) || 120000,
-        address: propAddress.trim() || "DirecciÃ³n de Pruebas Admin 123",
+        address: propAddress.trim() || "Dirección de Pruebas Admin 123",
         status: "available",
         bedrooms: 3,
         bathrooms: 2,
@@ -179,7 +179,7 @@ export const FirebaseAdminView: React.FC = () => {
     setTriggeringAuth(false);
     setTriggerResult({
       success: false,
-      error: "La creaciÃ³n o simulación de usuarios desde el navegador estÃ¡ deshabilitada. Use backend seguro con Firebase Admin SDK."
+      error: "La creación o simulación de usuarios desde el navegador está deshabilitada. Use backend seguro con Firebase Admin SDK."
     });
   };
 
@@ -205,7 +205,7 @@ export const FirebaseAdminView: React.FC = () => {
               Arquitectura de Servidor Firebase para 'Aguad CloudProp Suite'
             </h2>
             <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              Consola interactiva de inicializaciÃ³n y sincronizaciÃ³n. Permite verificar la conexiÃ³n al SDK, probar escrituras de Firestore Admin escalables y simular la activaciÃ³n y llamada a Cloud Functions.
+              Consola interactiva de inicialización y sincronización. Permite verificar la conexión al SDK, probar escrituras de Firestore Admin escalables y simular la activación y llamada a Cloud Functions.
             </p>
           </div>
           <div className="shrink-0 flex gap-2">
@@ -257,7 +257,7 @@ export const FirebaseAdminView: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">TÃ­tulo</label>
+                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Título</label>
                 <input 
                   type="text" 
                   value={propTitle}
@@ -283,7 +283,7 @@ export const FirebaseAdminView: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">DirecciÃ³n</label>
+                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Dirección</label>
                 <input 
                   type="text" 
                   value={propAddress}
@@ -320,14 +320,14 @@ export const FirebaseAdminView: React.FC = () => {
           {/* List of properties read via Admin SDK */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              Propiedades en Firestore (Sincronizado vÃ­a Admin Reader)
+              Propiedades en Firestore (Sincronizado vía Admin Reader)
             </h4>
             
             {loadingProperties ? (
               <div className="py-8 text-center text-xs text-slate-400">Cargando registros persistentes...</div>
             ) : firestoreProperties.length === 0 ? (
               <div className="py-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl">
-                No se encontraron propiedades registradas en Firestore. Â¡Crea una para comenzar la verificaciÃ³n!
+                No se encontraron propiedades registradas en Firestore. ¡Crea una para comenzar la verificación!
               </div>
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -363,7 +363,7 @@ export const FirebaseAdminView: React.FC = () => {
           <div className="flex items-center space-x-2 pb-3 border-b border-slate-50 dark:border-slate-800">
             <Cpu className="w-5 h-5 text-purple-500" />
             <div>
-              <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">EjecuciÃ³n y Triggers: Cloud Functions</h3>
+              <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Ejecución y Triggers: Cloud Functions</h3>
               <p className="text-[10px] text-slate-400 font-mono">SERVER FUNCTION DIAGNOSTICS</p>
             </div>
           </div>
@@ -407,7 +407,7 @@ export const FirebaseAdminView: React.FC = () => {
                 className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/25 dark:hover:bg-purple-900/30 text-purple-600 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition-colors uppercase cursor-pointer"
               >
                 {loadingStats ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
-                Calcular MÃ©tricas
+                Calcular Métricas
               </button>
             </div>
 
@@ -422,8 +422,8 @@ export const FirebaseAdminView: React.FC = () => {
           {/* Auth trigger test onUserCreated */}
           <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="space-y-1">
-              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase">DiagnÃ³stico Trigger: auth().onCreate()</h4>
-              <p className="text-[10px] text-slate-400">La creaciÃ³n de perfiles desde navegador estÃ¡ bloqueada. Este panel solo informa la polÃ­tica vigente.</p>
+              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase">Diagnóstico Trigger: auth().onCreate()</h4>
+              <p className="text-[10px] text-slate-400">La creación de perfiles desde navegador está bloqueada. Este panel solo informa la política vigente.</p>
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
@@ -438,7 +438,7 @@ export const FirebaseAdminView: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-0.5">
-                  <label className="text-[9px] text-slate-400 font-bold block uppercase">Correo ElectrÃ³nico</label>
+                  <label className="text-[9px] text-slate-400 font-bold block uppercase">Correo Electrónico</label>
                   <input 
                     type="email" 
                     value={triggerEmail} 
@@ -463,7 +463,7 @@ export const FirebaseAdminView: React.FC = () => {
                 disabled={triggeringAuth}
                 className="w-full py-1.5 bg-slate-800 hover:bg-slate-750 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
-                {triggeringAuth ? "Validando polÃ­tica..." : "Ver polÃ­tica de creaciÃ³n segura"}
+                {triggeringAuth ? "Validando política..." : "Ver política de creación segura"}
               </button>
 
               {triggerResult && (

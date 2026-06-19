@@ -127,13 +127,13 @@ export const UsersView: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        setSuccessMsg(data.message || "La cuenta ha sido reparada con Ã©xito.");
+        setSuccessMsg(data.message || "La cuenta ha sido reparada con éxito.");
         setTimeout(() => setSuccessMsg(null), 5000);
         setCheckResult(null);
         setEmailCheckInput('');
         loadUsers();
       } else {
-        setError(data.message || "La reparaciÃ³n fallÃ³.");
+        setError(data.message || "La reparación falló.");
       }
     } catch (err: any) {
       setError(err.message || "No se pudo conectar.");
@@ -178,9 +178,9 @@ export const UsersView: React.FC = () => {
     setFormError(null);
 
     if (!formData.displayName.trim()) return setFormError("El nombre es requerido.");
-    if (!formData.email.trim()) return setFormError("El correo electrÃ³nico es requerido.");
+    if (!formData.email.trim()) return setFormError("El correo electrónico es requerido.");
     if (formMode === 'create') {
-      setFormError("La creaciÃ³n de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
+      setFormError("La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
       return;
     }
 
@@ -189,7 +189,7 @@ export const UsersView: React.FC = () => {
     if (auth.currentUser) {
       try {
         if (formMode === 'create') {
-          throw new Error("La creaciÃ³n de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
+          throw new Error("La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.");
         } else {
           const userDocRef = doc(db, 'users', formData.uid);
           const updateData = {
@@ -312,7 +312,7 @@ export const UsersView: React.FC = () => {
         <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto opacity-80 mb-3" />
         <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">{t.common.no_permission}</h3>
         <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 leading-normal">
-          Este mÃ³dulo tÃ©cnico de gestiÃ³n e Ã­ndices estÃ¡ restringido estrictamente para cuentas con el nivel de acceso <strong className="text-rose-500 font-semibold uppercase">super_admin</strong>. (Pilar 6 de aislamiento).
+          Este módulo técnico de gestión e índices está restringido estrictamente para cuentas con el nivel de acceso <strong className="text-rose-500 font-semibold uppercase">super_admin</strong>. (Pilar 6 de aislamiento).
         </p>
       </div>
     );
@@ -398,7 +398,7 @@ export const UsersView: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Estado TÃ©cnico:</span>
+                  <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Estado Técnico:</span>
                   <div className={`p-2 rounded-lg font-bold text-center text-[10px] uppercase tracking-wider ${
                     checkResult.consistencyStatus === 'available' ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/20' :
                     checkResult.consistencyStatus === 'active_user_exists' ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/20' :
@@ -406,12 +406,12 @@ export const UsersView: React.FC = () => {
                   }`}>
                     {checkResult.consistencyStatus === 'available' ? t.users.statuses.active :
                      checkResult.consistencyStatus === 'active_user_exists' ? "ACTIVO COMPLETO" :
-                     "INCONSISTENCIA / HUÃ‰RFANO"}
+                     "INCONSISTENCIA / HUÉRFANO"}
                   </div>
                 </div>
 
                 <p className="text-[10px] text-slate-500 leading-normal">
-                  <strong className="text-slate-700 dark:text-slate-300 font-bold block">AcciÃ³n recomendada:</strong>
+                  <strong className="text-slate-700 dark:text-slate-300 font-bold block">Acción recomendada:</strong>
                   {checkResult.recommendedAction}
                 </p>
 
@@ -547,7 +547,7 @@ export const UsersView: React.FC = () => {
               {formMode === 'create' && (
                 <div className="bg-amber-50 border border-amber-100 text-amber-800 p-4 rounded-xl flex items-center space-x-3 text-xs">
                   <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
-                  <span className="font-semibold">La creaciÃ³n de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.</span>
+                  <span className="font-semibold">La creación de usuarios debe realizarse desde backend seguro con Firebase Admin SDK.</span>
                 </div>
               )}
 
@@ -657,7 +657,7 @@ export const UsersView: React.FC = () => {
       {/* Confirmation of permanent delete */}
       <ConfirmModal
         isOpen={deleteUserId !== null}
-        title="Â¿Eliminar Usuario de forma Definitiva?"
+        title="¿Eliminar Usuario de forma Definitiva?"
         message={t.users.delete_confirm}
         confirmText="Eliminar permanentemente"
         isDanger={true}
