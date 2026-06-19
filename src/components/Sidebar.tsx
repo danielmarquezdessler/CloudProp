@@ -14,7 +14,7 @@ import {
   Bot
 } from 'lucide-react';
 import { Language } from '../i18n';
-import { AGUADI_ZAP_MODULE_NAME, AGUADI_ZAP_PERMISSIONS } from '../../shared/aguadiZap';
+import { AGUADI_ZAP_PERMISSIONS } from '../../shared/aguadiZap';
 
 interface SidebarProps {
   currentTab: string;
@@ -53,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       key: 'aguadi',
-      label: AGUADI_ZAP_MODULE_NAME,
+      label: 'AGUADI ZAP',
       icon: Bot,
       roles: ['super_admin', 'agent']
     },
