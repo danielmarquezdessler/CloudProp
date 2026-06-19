@@ -630,7 +630,7 @@ export const AguadiCabinetView: React.FC = () => {
                 </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-none uppercase">
-                AGUADI ZAP — Centro de conversión WhatsApp 24/7
+                AGUADI ZAP — Conversión WhatsApp 24/7
               </h2>
               <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-light">
                 Configurá, probá y optimizá el asistente inteligente que convierte visitantes web en oportunidades comerciales por WhatsApp. Se alimenta de forma segura con modelos avanzados de Google Gemini y flujos de WhatsApp Business Platform.
