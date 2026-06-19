@@ -133,22 +133,22 @@ export const dictionary: Record<Language, Translations> = {
   es: {
     auth: {
       title: "Aguad CloudProp",
-      subtitle: "Suite de Gestión Inmobiliaria Inteligente",
-      email: "Correo electrónico",
-      password: "Contraseña",
-      submit: "Iniciar Sesión",
-      forgot: "¿Olvidó su contraseña?",
+      subtitle: "Suite de GestiÃ³n Inmobiliaria Inteligente",
+      email: "Correo electrÃ³nico",
+      password: "contraseña",
+      submit: "Iniciar sesión",
+      forgot: "Â¿OlvidÃ³ su contraseña?",
       suspended: "Su cuenta ha sido suspendida por el administrador.",
       incorrect: "El correo o la contraseña no son correctos.",
       help: "Contacto Soporte",
-      incomplete: "Este correo tiene un registro incompleto. Comuníquese con administración."
+      incomplete: "Este correo tiene un registro incompleto. ComunÃ­quese con administraciÃ³n."
     },
     navigation: {
       dashboard: "Escritorio",
       properties: "Propiedades",
       users: "Usuarios",
       audit: "Auditoría de Cambios",
-      logout: "Cerrar Sesión",
+      logout: "Cerrar sesión",
       welcome: "Hola, "
     },
     dashboard: {
@@ -157,26 +157,26 @@ export const dictionary: Record<Language, Translations> = {
       active_users: "Cuentas del Sistema",
       critical_logs: "Acciones Auditadas",
       recent_activity: "Actividad Reciente del Sistema",
-      welcome_message: "Bienvenido a la suite inmobiliaria unificada de Aguad Bienes Raíces.",
+      welcome_message: "Bienvenido a la suite inmobiliaria unificada de Aguad Bienes RaÃ­ces.",
       quick_stats: "Indicadores Clave de Rendimiento",
       role_info: "Nivel de acceso autorizado: ",
       see_all: "Ver todas"
     },
     properties: {
-      title: "Catálogo de Propiedades",
-      subtitle: "Búsqueda, creación, edición y administración de inmuebles",
+      title: "CatÃ¡logo de Propiedades",
+      subtitle: "BÃºsqueda, creaciÃ³n, ediciÃ³n y administraciÃ³n de inmuebles",
       add_new: "Agregar Propiedad",
       edit: "Editar Propiedad",
       delete: "Eliminar Propiedad",
       property_type: "Tipo de Inmueble",
       status: "Estado Comercial",
       price: "Precio (USD)",
-      address: "Dirección",
+      address: "DirecciÃ³n",
       bedrooms: "Dormitorios",
-      bathrooms: "Baños",
+      bathrooms: "baños",
       area: "Superficie",
-      empty_state: "No se encontraron propiedades. Intente ajustar los filtros de búsqueda.",
-      search_placeholder: "Buscar por título, dirección o tipo...",
+      empty_state: "No se encontraron propiedades. Intente ajustar los filtros de bÃºsqueda.",
+      search_placeholder: "Buscar por tÃ­tulo, direcciÃ³n o tipo...",
       save_success: "Propiedad guardada correctamente en el servidor.",
       delete_success: "Propiedad eliminada permanentemente de la base de datos.",
       types: {
@@ -191,32 +191,32 @@ export const dictionary: Record<Language, Translations> = {
         sold: "Vendido"
       },
       form: {
-        title_label: "Título de la Propiedad",
-        desc_label: "Descripción Detallada",
-        address_label: "Dirección Física Completa",
+        title_label: "TÃ­tulo de la Propiedad",
+        desc_label: "descripción Detallada",
+        address_label: "DirecciÃ³n FÃ­sica Completa",
         price_label: "Precio de Venta ($)",
         type_label: "Tipo de Propiedad",
         status_label: "Estado de Venta",
-        beds_label: "Número de Dormitorios",
-        baths_label: "Número de Baños",
-        area_label: "Superficie Cubierta (m²)",
+        beds_label: "NÃºmero de Dormitorios",
+        baths_label: "NÃºmero de baños",
+        area_label: "Superficie Cubierta (mÂ²)",
         img_label: "URL de Imagen de Portada"
       }
     },
     users: {
-      title: "Gestión de Personal y Clientes",
-      subtitle: "Creación sincronizada de credenciales y perfiles relacionados",
+      title: "GestiÃ³n de Personal y Clientes",
+      subtitle: "CreaciÃ³n sincronizada de credenciales y perfiles relacionados",
       add_new: "Crear Cuenta de Usuario",
       role: "Rol del Sistema",
       status: "Estado de Cuenta",
       verify_email: "Verificar Disponibilidad de Email",
       email_check_title: "Verificador de Disponibilidad e Inconsistencias de Email",
-      email_check_desc: "Verifica si el email existe en Auth, Firestore o si se encuentra huérfano.",
+      email_check_desc: "Verifica si el email existe en Auth, Firestore o si se encuentra huÃ©rfano.",
       check_btn: "Consultar Estado de Correo",
       repair_btn: "Reparar Cuenta Incompleta",
-      delete_confirm: "¿Está seguro de eliminar permanentemente este usuario? Esta acción es irreversible.",
+      delete_confirm: "Â¿EstÃ¡ seguro de eliminar permanentemente este usuario? Esta acciÃ³n es irreversible.",
       delete_success: "Usuario eliminado definitivamente de Auth y Firestore.",
-      create_success: "Usuario creado exitosamente con sincronización completa.",
+      create_success: "Usuario creado exitosamente con sincronizaciÃ³n completa.",
       roles: {
         super_admin: "Superadministrador",
         agent: "Agente de Ventas",
@@ -225,36 +225,36 @@ export const dictionary: Record<Language, Translations> = {
       statuses: {
         active: "Activo / Autorizado",
         suspended: "Suspendido / Bloqueado",
-        incomplete: "Incompleto / Huérfano"
+        incomplete: "Incompleto / HuÃ©rfano"
       },
       form: {
         name: "Nombre y Apellido",
-        email: "Dirección de Correo",
-        password: "Contraseña Temporal",
-        role: "Rol Técnico",
+        email: "DirecciÃ³n de Correo",
+        password: "contraseña Temporal",
+        role: "Rol TÃ©cnico",
         status: "Estado Inicial de Cuenta"
       }
     },
     logs: {
-      title: "Registro de Auditoría Técnica",
+      title: "Registro de Auditoría TÃ©cnica",
       subtitle: "Historial detallado de operaciones sensibles de base de datos en el servidor",
-      table_action: "Operación",
+      table_action: "operación",
       table_user: "Usuario Operador",
-      table_details: "Descripción del Cambio",
+      table_details: "descripción del Cambio",
       table_time: "Sello de Tiempo (UTC)",
-      empty: "Sin registros de auditoría disponibles."
+      empty: "Sin registros de Auditoría disponibles."
     },
     common: {
       save: "Guardar Cambios",
       cancel: "Cancelar",
-      confirm: "Confirmar Acción",
+      confirm: "Confirmar AcciÃ³n",
       delete: "Eliminar Permanente",
       back: "Volver",
       actions: "Acciones",
       loading: "Procesando operación segura...",
-      error: "Ha ocurrido un error en la transacción",
-      no_permission: "No tiene permisos requeridos para ver esta página.",
-      success: "Transacción confirmada.",
+      error: "Ha ocurrido un error en la transacciÃ³n",
+      no_permission: "No tiene permisos requeridos para ver esta pÃ¡gina.",
+      success: "TransacciÃ³n confirmada.",
       view_details: "Detalles"
     }
   },
@@ -285,7 +285,7 @@ export const dictionary: Record<Language, Translations> = {
       active_users: "System Accounts",
       critical_logs: "Audited Actions",
       recent_activity: "Recent System Activity",
-      welcome_message: "Welcome to Aguad Bienes Raíces unified real estate suite.",
+      welcome_message: "Welcome to Aguad Bienes RaÃ­ces unified real estate suite.",
       quick_stats: "Key Performance Indicators",
       role_info: "Authorized Access Level: ",
       see_all: "See all"
@@ -327,7 +327,7 @@ export const dictionary: Record<Language, Translations> = {
         status_label: "Sales Status",
         beds_label: "Bedrooms Count",
         baths_label: "Bathrooms Count",
-        area_label: "Floor Area (m²)",
+        area_label: "Floor Area (mÂ²)",
         img_label: "Cover Image URL"
       }
     },
@@ -390,51 +390,51 @@ export const dictionary: Record<Language, Translations> = {
     auth: {
       title: "Aguad CloudProp",
       subtitle: "Smart Real Estate Management Suite",
-      email: "Endereço de e-mail",
+      email: "EndereÃ§o de e-mail",
       password: "Senha",
       submit: "Entrar",
       forgot: "Esqueceu sua senha?",
       suspended: "Sua conta foi suspensa temporariamente pelo administrador.",
       incorrect: "E-mail ou senha incorretos.",
-      help: "Suporte Técnico",
-      incomplete: "Esta conta está com registro incompleto. Entre em contato."
+      help: "Suporte TÃ©cnico",
+      incomplete: "Esta conta estÃ¡ com registro incompleto. Entre em contato."
     },
     navigation: {
       dashboard: "Painel",
       properties: "Propriedades",
-      users: "Usuários",
+      users: "UsuÃ¡rios",
       audit: "Trilha de Auditoria",
       logout: "Sair",
-      welcome: "Olá, "
+      welcome: "OlÃ¡, "
     },
     dashboard: {
       title: "Painel de Controle",
-      properties_count: "Imóveis listados",
-      active_users: "Usuários Ativos",
-      critical_logs: "Ações Auditadas",
+      properties_count: "ImÃ³veis listados",
+      active_users: "UsuÃ¡rios Ativos",
+      critical_logs: "AÃ§Ãµes Auditadas",
       recent_activity: "Atividade Recente do Sistema",
-      welcome_message: "Bem-vindo às soluções imobiliárias integradas da Aguad Bienes Raíces.",
+      welcome_message: "Bem-vindo Ã s soluÃ§Ãµes imobiliÃ¡rias integradas da Aguad Bienes RaÃ­ces.",
       quick_stats: "Indicadores Clave de Performance",
-      role_info: "Nível de Acesso Autorizado: ",
+      role_info: "NÃ­vel de Acesso Autorizado: ",
       see_all: "Ver tudo"
     },
     properties: {
-      title: "Catálogo de Imóveis",
+      title: "CatÃ¡logo de ImÃ³veis",
       subtitle: "Pesquisar, criar, editar e gerenciar propriedades",
-      add_new: "Adicionar Imóvel",
-      edit: "Editar Imóvel",
-      delete: "Excluir Imóvel",
-      property_type: "Tipo do Imóvel",
+      add_new: "Adicionar ImÃ³vel",
+      edit: "Editar ImÃ³vel",
+      delete: "Excluir ImÃ³vel",
+      property_type: "Tipo do ImÃ³vel",
       status: "Status Comercial",
-      price: "Preço (USD)",
-      address: "Endereço completo",
+      price: "PreÃ§o (USD)",
+      address: "EndereÃ§o completo",
       bedrooms: "Quartos",
       bathrooms: "Banheiros",
-      area: "Área de cobertura",
-      empty_state: "Nenhum imóvel foi encontrado. Tente ajustar os filtros.",
-      search_placeholder: "Buscar por título, endereço ou tipo...",
-      save_success: "Imóvel cadastrado com sucesso no servidor corporativo.",
-      delete_success: "Imóvel excluído permanentemente da base de dados.",
+      area: "Ãrea de cobertura",
+      empty_state: "Nenhum imÃ³vel foi encontrado. Tente ajustar os filtros.",
+      search_placeholder: "Buscar por tÃ­tulo, endereÃ§o ou tipo...",
+      save_success: "ImÃ³vel cadastrado com sucesso no servidor corporativo.",
+      delete_success: "ImÃ³vel excluÃ­do permanentemente da base de dados.",
       types: {
         house: "Casa Residencial",
         apartment: "Apartamento",
@@ -442,37 +442,37 @@ export const dictionary: Record<Language, Translations> = {
         commercial: "Ponto Comercial"
       },
       statuses: {
-        available: "Disponível",
+        available: "DisponÃ­vel",
         reserved: "Reservado",
         sold: "Vendido"
       },
       form: {
-        title_label: "Título do Imóvel",
-        desc_label: "Descrição Detalhada",
-        address_label: "Endereço Físico Completo",
-        price_label: "Preço de Venda ($)",
-        type_label: "Tipo de Imóvel",
-        status_label: "Status da Transação",
+        title_label: "TÃ­tulo do ImÃ³vel",
+        desc_label: "DescriÃ§Ã£o Detalhada",
+        address_label: "EndereÃ§o FÃ­sico Completo",
+        price_label: "PreÃ§o de Venda ($)",
+        type_label: "Tipo de ImÃ³vel",
+        status_label: "Status da TransaÃ§Ã£o",
         beds_label: "Quantidade de Quartos",
         baths_label: "Quantidade de Banheiros",
-        area_label: "Área Total (m²)",
+        area_label: "Ãrea Total (mÂ²)",
         img_label: "URL da Imagem Principal"
       }
     },
     users: {
-      title: "Gestão de Pessoas",
-      subtitle: "Criação síncrona de credenciais em Auth e perfis Firestore correspondentes",
-      add_new: "Criar Conta de Usuário",
-      role: "Função no Painel",
+      title: "GestÃ£o de Pessoas",
+      subtitle: "CriaÃ§Ã£o sÃ­ncrona de credenciais em Auth e perfis Firestore correspondentes",
+      add_new: "Criar Conta de UsuÃ¡rio",
+      role: "FunÃ§Ã£o no Painel",
       status: "Status do Cadastro",
       verify_email: "Verificar Disponibilidade de E-mail",
-      email_check_title: "Validador Técnico de E-mails",
-      email_check_desc: "Verifique a existência em Auth, base de dados ou falhas de sincronização.",
-      check_btn: "Pesquisar Situação",
+      email_check_title: "Validador TÃ©cnico de E-mails",
+      email_check_desc: "Verifique a existÃªncia em Auth, base de dados ou falhas de sincronizaÃ§Ã£o.",
+      check_btn: "Pesquisar SituaÃ§Ã£o",
       repair_btn: "Reparar Cadastro Corrompido",
-      delete_confirm: "Deseja mesmo remover permanentemente esse usuário? Esta ação é irreversível.",
-      delete_success: "Usuário removido definitivamente de Auth e Firestore.",
-      create_success: "Usuário criado com sucesso e sincronizado.",
+      delete_confirm: "Deseja mesmo remover permanentemente esse usuÃ¡rio? Esta aÃ§Ã£o Ã© irreversÃ­vel.",
+      delete_success: "UsuÃ¡rio removido definitivamente de Auth e Firestore.",
+      create_success: "UsuÃ¡rio criado com sucesso e sincronizado.",
       roles: {
         super_admin: "Super Administrador",
         agent: "Agente de Vendas",
@@ -481,36 +481,36 @@ export const dictionary: Record<Language, Translations> = {
       statuses: {
         active: "Ativo / Autorizado",
         suspended: "Suspenso / Bloqueado",
-        incomplete: "Incompleto / Órfão"
+        incomplete: "Incompleto / Ã“rfÃ£o"
       },
       form: {
         name: "Nome completo",
         email: "E-mail de cadastro",
-        password: "Senha temporária",
-        role: "Nível técnico",
-        status: "Ativação inicial"
+        password: "Senha temporÃ¡ria",
+        role: "NÃ­vel tÃ©cnico",
+        status: "AtivaÃ§Ã£o inicial"
       }
     },
     logs: {
-      title: "Histórico de Trilha Técnica",
-      subtitle: "Registros detalhados de modificações na base executadas pelo servidor",
-      table_action: "Função",
-      table_user: "Usuário executor",
+      title: "HistÃ³rico de Trilha TÃ©cnica",
+      subtitle: "Registros detalhados de modificaÃ§Ãµes na base executadas pelo servidor",
+      table_action: "FunÃ§Ã£o",
+      table_user: "UsuÃ¡rio executor",
       table_details: "Trilha do Log",
       table_time: "Protocolo de Tempo (UTC)",
-      empty: "Sem registros históricos no momento."
+      empty: "Sem registros histÃ³ricos no momento."
     },
     common: {
-      save: "Salvar alterações",
+      save: "Salvar alteraÃ§Ãµes",
       cancel: "Cancelar",
-      confirm: "Confirmar ação",
+      confirm: "Confirmar aÃ§Ã£o",
       delete: "Excluir Definitivo",
       back: "Volver",
-      actions: "Ações",
-      loading: "Aguardando transação segura...",
+      actions: "AÃ§Ãµes",
+      loading: "Aguardando transaÃ§Ã£o segura...",
       error: "Ocorreu um erro no servidor",
-      no_permission: "Você não possui as permissões necessárias para acessar esta página.",
-      success: "Transação confirmada com sucesso.",
+      no_permission: "VocÃª nÃ£o possui as permissÃµes necessÃ¡rias para acessar esta pÃ¡gina.",
+      success: "TransaÃ§Ã£o confirmada com sucesso.",
       view_details: "Visualizar"
     }
   }

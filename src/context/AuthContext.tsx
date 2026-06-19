@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const authUidOk = userData.authUid === firebaseUser.uid;
 
             if (!statusOk) {
-              setError("Tu usuario está suspendido. Contactá al administrador.");
+              setError("Tu usuario estÃ¡ suspendido. ContactÃ¡ al administrador.");
               setUser(null);
               await signOut(auth);
               localStorage.removeItem('aguad_cloudprop_uid');
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               localStorage.removeItem('aguad_cloudprop_name');
               localStorage.removeItem('aguad_cloudprop_role');
             } else if (!roleOk || !permissionsOk || !orgIdOk || !authUidOk) {
-              setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
+              setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
               setUser(null);
               await signOut(auth);
               localStorage.removeItem('aguad_cloudprop_uid');
@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } else {
             // Profile does not exist yet inside Firestore - BLOCK AND LOGOUT
-            setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
+            setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
             setUser(null);
             await signOut(auth);
             localStorage.removeItem('aguad_cloudprop_uid');
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (err) {
           console.error("Session profile sync error with Firestore", err);
-          setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
+          setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
           setUser(null);
           await signOut(auth);
         }
@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('aguad_cloudprop_email');
       localStorage.removeItem('aguad_cloudprop_name');
       localStorage.removeItem('aguad_cloudprop_role');
-      throw new Error("Su sesión ha expirado o no está autorizado.");
+      throw new Error("Su sesión ha expirado o no estÃ¡ autorizado.");
     }
 
     return response;

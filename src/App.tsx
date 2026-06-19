@@ -157,7 +157,7 @@ function AppContent() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     className="w-full pl-11 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all dark:bg-slate-800 dark:border-slate-800 dark:text-slate-100"
                     required
                     id="login-password-input"
@@ -197,7 +197,7 @@ function AppContent() {
 
             {showForgotMsg && (
               <div className="bg-teal-50/70 border border-teal-100 text-teal-800 p-4 rounded-2xl text-xs text-center animate-fade-in dark:bg-teal-950/20 dark:border-teal-900 dark:text-teal-300">
-                Para recuperar su contraseña de acceso, por favor póngase en contacto directo con soporte de administración.
+                Para recuperar su contraseña de acceso, por favor pÃ³ngase en contacto directo con soporte de administraciÃ³n.
               </div>
             )}
           </div>
@@ -249,3 +249,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

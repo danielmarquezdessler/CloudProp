@@ -195,10 +195,10 @@ export const PropertiesView: React.FC = () => {
     setFormError(null);
     
     // Validations (Rule 6/15)
-    if (!formData.title.trim()) return setFormError("El título no puede estar vacío.");
-    if (!formData.address.trim()) return setFormError("La dirección física es mandatoria.");
-    if (formData.price <= 0) return setFormError("El precio debe ser un número positivo.");
-    if (formData.areaSqM <= 0) return setFormError("La superficie debe ser un número positivo.");
+    if (!formData.title.trim()) return setFormError("El tÃ­tulo no puede estar vacÃ­o.");
+    if (!formData.address.trim()) return setFormError("La direcciÃ³n fÃ­sica es mandatoria.");
+    if (formData.price <= 0) return setFormError("El precio debe ser un nÃºmero positivo.");
+    if (formData.areaSqM <= 0) return setFormError("La superficie debe ser un nÃºmero positivo.");
 
     setFormSubmitting(true);
 
@@ -385,7 +385,7 @@ export const PropertiesView: React.FC = () => {
             className="px-3.5 py-1.5 text-xs font-semibold bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 dark:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
             id="filter-type-select"
           >
-            <option value="all">Todas las categorías</option>
+            <option value="all">Todas las categorÃ­as</option>
             <option value="house">{t.properties.types.house}</option>
             <option value="apartment">{t.properties.types.apartment}</option>
             <option value="land">{t.properties.types.land}</option>
@@ -502,7 +502,7 @@ export const PropertiesView: React.FC = () => {
                       {p.areaSqM > 0 && (
                         <div className="flex items-center space-x-1">
                           <Maximize className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{p.areaSqM} m²</span>
+                          <span>{p.areaSqM} mÂ²</span>
                         </div>
                       )}
                     </div>
@@ -811,7 +811,7 @@ export const PropertiesView: React.FC = () => {
 
               {/* Description */}
               <div className="space-y-1">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Descripción del Inmueble</h4>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">descripción del Inmueble</h4>
                 <p className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
                   {selectedProperty.description}
                 </p>
@@ -829,7 +829,7 @@ export const PropertiesView: React.FC = () => {
                 </div>
                 <div className="text-center">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">{t.properties.area}</span>
-                  <span className="text-xs font-extrabold text-slate-700 block mt-1 dark:text-slate-200">{selectedProperty.areaSqM} m²</span>
+                  <span className="text-xs font-extrabold text-slate-700 block mt-1 dark:text-slate-200">{selectedProperty.areaSqM} mÂ²</span>
                 </div>
               </div>
 
@@ -854,8 +854,8 @@ export const PropertiesView: React.FC = () => {
       {/* Reusable Confirm modal for destructions */}
       <ConfirmModal 
         isOpen={deletePropId !== null}
-        title="¿Eliminar Propiedad?"
-        message="Esta acción es definitiva y eliminará permanentemente la oferta de propiedades de la base de datos corporativa. Se registrará en la auditoría técnica del servidor."
+        title="Â¿Eliminar Propiedad?"
+        message="Esta acciÃ³n es definitiva y eliminarÃ¡ permanentemente la oferta de propiedades de la base de datos corporativa. Se registrarÃ¡ en la Auditoría tÃ©cnica del servidor."
         confirmText="Eliminar permanentemente"
         isDanger={true}
         isLoading={isDeleting}

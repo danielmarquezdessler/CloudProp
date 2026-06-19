@@ -70,7 +70,7 @@ export const AguadiCabinetView: React.FC = () => {
   // Selected entities for simulator
   const [selectedConversation, setSelectedConversation] = useState<AguadiConversation | null>(null);
   const [simulatedPhone, setSimulatedPhone] = useState<string>('+5493816551234');
-  const [simulatedText, setSimulatedText] = useState<string>('Hola, estoy interesado en comprar una casa de 3 dormitorios con cochera en Yerba Buena. Mi presupuesto máximo es de USD 150000. Gracias, soy Carlos Gómez.');
+  const [simulatedText, setSimulatedText] = useState<string>('Hola, estoy interesado en comprar una casa de 3 dormitorios con cochera en Yerba Buena. Mi presupuesto mÃ¡ximo es de USD 150000. Gracias, soy Carlos GÃ³mez.');
   const [simulatedChannel, setSimulatedChannel] = useState<'whatsapp' | 'widget'>('whatsapp');
   
   // Rule Creation States
@@ -169,7 +169,7 @@ export const AguadiCabinetView: React.FC = () => {
       fetchAguadiData();
     } else if (user) {
       setLoading(false);
-      setErrorMsg('Falta orgId en el perfil autenticado. No se usará un fallback de organización.');
+      setErrorMsg('Falta orgId en el perfil autenticado. No se usarÃ¡ un fallback de organizaciÃ³n.');
     }
   }, [user]);
 
@@ -200,7 +200,7 @@ export const AguadiCabinetView: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("¡Parámetros de AGUADI ZAP guardados de forma exitosa!");
+        alert("Â¡ParÃ¡metros de AGUADI ZAP guardados de forma exitosa!");
         fetchAguadiData();
       } else {
         alert("Error guardando settings: " + data.error);
@@ -228,7 +228,7 @@ export const AguadiCabinetView: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("¡Configuración visual del Widget grabada correctamente!");
+        alert("Â¡configuración visual del Widget grabada correctamente!");
         fetchAguadiData();
       } else {
         alert("Error guardando widget: " + data.error);
@@ -244,7 +244,7 @@ export const AguadiCabinetView: React.FC = () => {
   const handleSimulateIncoming = async () => {
     if (!simulatedText.trim() || !simulatedPhone.trim()) return;
     if (!user?.orgId) {
-      setErrorMsg('Falta orgId en el perfil autenticado. No se puede simular sin organización real.');
+      setErrorMsg('Falta orgId en el perfil autenticado. No se puede simular sin organizaciÃ³n real.');
       return;
     }
     try {
@@ -331,7 +331,7 @@ export const AguadiCabinetView: React.FC = () => {
 
   // Delete Assignment Rule
   const handleDeleteRoutingRule = async (id: string) => {
-    if (!confirm("¿Estás seguro de eliminar esta regla de ruteo?")) return;
+    if (!confirm("Â¿EstÃ¡s seguro de eliminar esta regla de ruteo?")) return;
     try {
       const res = await fetch('/api/aguadi/routing-rules/delete', {
         method: 'POST',
@@ -382,7 +382,7 @@ export const AguadiCabinetView: React.FC = () => {
 
   // Delete Context Instruction Rule
   const handleDeleteTrainingRule = async (id: string) => {
-    if (!confirm("¿Eliminar esta directriz de entrenamiento de IA?")) return;
+    if (!confirm("Â¿Eliminar esta directriz de entrenamiento de IA?")) return;
     try {
       const res = await fetch('/api/aguadi/training-rules/delete', {
         method: 'POST',
@@ -434,7 +434,7 @@ export const AguadiCabinetView: React.FC = () => {
 
   // Delete Response Template
   const handleDeleteTemplate = async (id: string) => {
-    if (!confirm("¿Eliminar esta plantilla institucional de respuesta?")) return;
+    if (!confirm("Â¿Eliminar esta plantilla institucional de respuesta?")) return;
     try {
       const res = await fetch('/api/aguadi/response-templates/delete', {
         method: 'POST',
@@ -496,11 +496,11 @@ export const AguadiCabinetView: React.FC = () => {
                   ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30' 
                   : 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30'
               }`}>
-                {settings?.status === 'active' ? '● En Línea' : '○ En Pausa'}
+                {settings?.status === 'active' ? 'â— En LÃ­nea' : 'â—‹ En Pausa'}
               </span>
             </div>
             <p className="text-slate-400 text-xs mt-1 font-medium">
-              Robot calificador integrado con Google Gemini para leads de {settings?.businessName || "Facundo Aguad Bienes Raíces"}.
+              Robot calificador integrado con Google Gemini para leads de {settings?.businessName || "Facundo Aguad Bienes RaÃ­ces"}.
             </p>
           </div>
         </div>
@@ -532,7 +532,7 @@ export const AguadiCabinetView: React.FC = () => {
             <p className="text-2xl font-black text-emerald-500 tracking-tight leading-none mt-1">{metricsSummary.qualifiedLeads || 0}</p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Calificación Promedio (Score)</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">CalificaciÃ³n Promedio (Score)</span>
             <p className="text-2xl font-black text-teal-500 tracking-tight leading-none mt-1">{metricsSummary.averageLeadScore || 0}%</p>
           </div>
         </div>
@@ -606,7 +606,7 @@ export const AguadiCabinetView: React.FC = () => {
           }`}
         >
           <Activity className="w-4 h-4" />
-          <span>Telemetría & Auditoría</span>
+          <span>TelemetrÃ­a & Auditoría</span>
         </button>
       </div>
 
@@ -623,17 +623,17 @@ export const AguadiCabinetView: React.FC = () => {
             <div className="space-y-3 max-w-2xl relative z-10">
               <div className="flex items-center space-x-2">
                 <span className="bg-teal-500 text-slate-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full font-mono">
-                  MÓDULO CENTRAL SaaS
+                  MÃ“DULO CENTRAL SaaS
                 </span>
                 <span className="text-[10px] font-mono text-slate-350 tracking-wider">
                   cloudprop.aguadbienesraices.com.ar
                 </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-none uppercase">
-                AGUADI ZAP — Conversión WhatsApp 24/7
+                AGUADI ZAP â€” ConversiÃ³n WhatsApp 24/7
               </h2>
               <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-light">
-                Configurá, probá y optimizá el asistente inteligente que convierte visitantes web en oportunidades comerciales por WhatsApp. Se alimenta de forma segura con modelos avanzados de Google Gemini y flujos de WhatsApp Business Platform.
+                ConfigurÃ¡, probÃ¡ y optimizÃ¡ el asistente inteligente que convierte visitantes web en oportunidades comerciales por WhatsApp. Se alimenta de forma segura con modelos avanzados de Google Gemini y flujos de WhatsApp Business Platform.
               </p>
             </div>
 
@@ -759,9 +759,9 @@ export const AguadiCabinetView: React.FC = () => {
               <span className="text-[8.5px] font-mono text-slate-400">Descartados o cerrados</span>
             </div>
 
-            {/* Card 5: Tasa de conversión */}
+            {/* Card 5: Tasa de conversiÃ³n */}
             <div className="bg-white rounded-2xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Tasa de conversión</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Tasa de conversiÃ³n</span>
               <p className="text-2xl font-black text-indigo-500 mt-1 font-sans">
                 {conversations.length > 0 ? Math.round((leads.length / conversations.length) * 100) : 0}%
               </p>
@@ -772,25 +772,25 @@ export const AguadiCabinetView: React.FC = () => {
             <div className="bg-white rounded-2xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Tiempo Promedio Respuesta</span>
               <p className="text-2xl font-black text-slate-400 mt-1 font-sans font-mono">N/A</p>
-              <span className="text-[8.5px] font-mono text-slate-400">Esperando tráfico</span>
+              <span className="text-[8.5px] font-mono text-slate-400">Esperando trÃ¡fico</span>
             </div>
 
             {/* Card 7: Score promedio de oportunidad */}
             <div className="bg-white rounded-2xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Score Promedio Oportunidad</span>
               <p className="text-2xl font-black text-emerald-500 mt-1 font-sans">{metricsSummary?.averageLeadScore || 0}%</p>
-              <span className="text-[8.5px] font-mono text-emerald-500">Nivel de calificación</span>
+              <span className="text-[8.5px] font-mono text-emerald-500">Nivel de calificaciÃ³n</span>
             </div>
 
-            {/* Card 8: Última actividad */}
+            {/* Card 8: Ãšltima actividad */}
             <div className="bg-white rounded-2xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Última Actividad</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Ãšltima Actividad</span>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 mt-3 truncate font-mono">
                 {conversations.length > 0 
                   ? new Date(conversations[0].lastMessageAt).toLocaleDateString() + ' ' + new Date(conversations[0].lastMessageAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                  : 'Sin interacción aún'}
+                  : 'Sin interacción aÃºn'}
               </p>
-              <span className="text-[8.5px] font-mono text-slate-400">Aparato de telemetría</span>
+              <span className="text-[8.5px] font-mono text-slate-400">Aparato de telemetrÃ­a</span>
             </div>
 
           </div>
@@ -809,10 +809,10 @@ export const AguadiCabinetView: React.FC = () => {
 
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   
-                  {/* Item 1. Configuración general */}
+                  {/* Item 1. configuración general */}
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
-                      <strong className="text-slate-850 font-bold dark:text-slate-100">Configuración general</strong>
+                      <strong className="text-slate-850 font-bold dark:text-slate-100">configuración general</strong>
                       <p className="text-slate-400 mt-0.5 leading-relaxed">Establece el nombre comercial del deudor y los tonos del robot.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
@@ -825,7 +825,7 @@ export const AguadiCabinetView: React.FC = () => {
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
                       <strong className="text-slate-850 font-bold dark:text-slate-100">Motor IA Gemini</strong>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">Conector sintético para descodificación de leads con LLM avanzado.</p>
+                      <p className="text-slate-400 mt-0.5 leading-relaxed">Conector sintÃ©tico para descodificaciÃ³n de leads con LLM avanzado.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono border ${
@@ -841,7 +841,7 @@ export const AguadiCabinetView: React.FC = () => {
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
                       <strong className="text-slate-850 font-bold dark:text-slate-100">WhatsApp Cloud API</strong>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">Canal directo para chats simultáneos en el número verificado.</p>
+                      <p className="text-slate-400 mt-0.5 leading-relaxed">Canal directo para chats simultÃ¡neos en el nÃºmero verificado.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono border ${
@@ -853,11 +853,11 @@ export const AguadiCabinetView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Item 4. Widget web público */}
+                  {/* Item 4. Widget web pÃºblico */}
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
-                      <strong className="text-slate-850 font-bold dark:text-slate-100">Widget web público</strong>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">Incrustador flotante de script para tu página web corporativa.</p>
+                      <strong className="text-slate-850 font-bold dark:text-slate-100">Widget web pÃºblico</strong>
+                      <p className="text-slate-400 mt-0.5 leading-relaxed">Incrustador flotante de script para tu pÃ¡gina web corporativa.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono border ${
@@ -869,11 +869,11 @@ export const AguadiCabinetView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Item 5. Reglas de derivación */}
+                  {/* Item 5. Reglas de derivaciÃ³n */}
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
-                      <strong className="text-slate-850 font-bold dark:text-slate-100">Reglas de derivación</strong>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">Criterios inteligentes de asignación de prospectos a asesores.</p>
+                      <strong className="text-slate-850 font-bold dark:text-slate-100">Reglas de derivaciÃ³n</strong>
+                      <p className="text-slate-400 mt-0.5 leading-relaxed">Criterios inteligentes de asignaciÃ³n de prospectos a asesores.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono border ${
@@ -889,7 +889,7 @@ export const AguadiCabinetView: React.FC = () => {
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
                       <strong className="text-slate-850 font-bold dark:text-slate-100">Entrenamiento IA</strong>
-                      <p className="text-slate-400 mt-0.5 leading-relaxed">Pautas y directrices de protección lingüística para el bot.</p>
+                      <p className="text-slate-400 mt-0.5 leading-relaxed">Pautas y directrices de protecciÃ³n lingÃ¼Ã­stica para el bot.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono border ${
@@ -921,18 +921,18 @@ export const AguadiCabinetView: React.FC = () => {
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center space-x-2.5">
                     <Sliders className="w-5 h-5 text-teal-500" />
-                    <h3 className="text-xs font-black font-mono uppercase tracking-wider text-slate-400">Embudo de conversión comercial</h3>
+                    <h3 className="text-xs font-black font-mono uppercase tracking-wider text-slate-400">Embudo de conversiÃ³n comercial</h3>
                   </div>
                   {conversations.length > 0 && (
                     <span className="text-[10px] font-mono text-emerald-500 font-bold bg-emerald-50 px-2 py-0.5 rounded">
-                      Calificación Activa
+                      CalificaciÃ³n Activa
                     </span>
                   )}
                 </div>
 
                 {conversations.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 border border-dashed rounded-2xl border-slate-100">
-                    <p className="text-xs font-semibold leading-normal font-mono uppercase tracking-wider">Todavía no hay actividad suficiente para calcular el embudo de conversión.</p>
+                    <p className="text-xs font-semibold leading-normal font-mono uppercase tracking-wider">TodavÃ­a no hay actividad suficiente para calcular el embudo de conversiÃ³n.</p>
                   </div>
                 ) : (
                   <div className="space-y-3.5 pt-2">
@@ -1040,7 +1040,7 @@ export const AguadiCabinetView: React.FC = () => {
                 {conversations.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 border border-dashed rounded-2xl border-slate-100">
                     <p className="text-xs font-semibold font-mono text-slate-400 uppercase tracking-wider">
-                      Todavía no hay conversaciones registradas. Cuando AGUADI ZAP comience a operar, aparecerán aquí.
+                      TodavÃ­a no hay conversaciones registradas. Cuando AGUADI ZAP comience a operar, aparecerÃ¡n aquÃ­.
                     </p>
                   </div>
                 ) : (
@@ -1051,7 +1051,7 @@ export const AguadiCabinetView: React.FC = () => {
                           <th className="p-2.5">Fecha</th>
                           <th className="p-2.5">Cliente</th>
                           <th className="p-2.5">Canal</th>
-                          <th className="p-2.5">Intención / Operación</th>
+                          <th className="p-2.5">Intención / operación</th>
                           <th className="p-2.5">Estado</th>
                           <th className="p-2.5">Score</th>
                           <th className="p-2.5">Acciones</th>
@@ -1116,7 +1116,7 @@ export const AguadiCabinetView: React.FC = () => {
               
               {/* Recommended Actions */}
               <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-3">
-                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Próximas acciones recomendadas</strong>
+                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">PrÃ³ximas acciones recomendadas</strong>
                 
                 <div className="space-y-2.5 text-xs font-sans">
                   
@@ -1130,14 +1130,14 @@ export const AguadiCabinetView: React.FC = () => {
                   {!settings?.whatsappEnabled && (
                     <div className="p-3 bg-amber-500/5 border border-amber-500/15 rounded-2xl relative">
                       <p className="font-bold text-slate-800 dark:text-amber-300 text-[11px]">Configurar WhatsApp Cloud API</p>
-                      <p className="text-slate-500 text-[10px] mt-1">Conecta el webhook oficial para que AGUADI ZAP interactúe directamente desde tu línea verificada de WhatsApp Business.</p>
+                      <p className="text-slate-500 text-[10px] mt-1">Conecta el webhook oficial para que AGUADI ZAP interactÃºe directamente desde tu lÃ­nea verificada de WhatsApp Business.</p>
                     </div>
                   )}
 
                   {/* Action 3: Routing rules */}
                   {routingRules.length === 0 && (
                     <div className="p-3 bg-indigo-500/5 border border-indigo-500/15 rounded-2xl relative">
-                      <p className="font-bold text-indigo-700 dark:text-indigo-300 text-[11px]">Crear regla de derivación a agentes</p>
+                      <p className="font-bold text-indigo-700 dark:text-indigo-300 text-[11px]">Crear regla de derivaciÃ³n a agentes</p>
                       <p className="text-slate-500 text-[10px] mt-1">Asigna de forma programada los leads de compra a Facundo y alquileres a Marcos Vargas.</p>
                     </div>
                   )}
@@ -1145,7 +1145,7 @@ export const AguadiCabinetView: React.FC = () => {
                   {/* Action 4: Widget allowed domains */}
                   <div className="p-3 bg-slate-50 border border-slate-250/30 rounded-2xl relative dark:bg-slate-850 dark:border-slate-800">
                     <p className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">Completar entrenamiento y directivas de la IA</p>
-                    <p className="text-slate-500 text-[10px] mt-1">Inyecta pautas estrictas en la pestaña Ruteo y Directrices para que el bot responda con cautela profesional.</p>
+                    <p className="text-slate-500 text-[10px] mt-1">Inyecta pautas estrictas en la pestaÃ±a Ruteo y Directrices para que el bot responda con cautela profesional.</p>
                   </div>
 
                 </div>
@@ -1173,19 +1173,19 @@ export const AguadiCabinetView: React.FC = () => {
                       <strong className="text-slate-800 dark:text-slate-100 truncate block">{widgetConfig?.visibleName || AGUADI_ZAP_MODULE_NAME}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block uppercase font-mono">Posición</span>
+                      <span className="text-slate-400 block uppercase font-mono">PosiciÃ³n</span>
                       <strong className="text-slate-800 dark:text-slate-100 truncate block">{widgetConfig?.position || 'derecha'}</strong>
                     </div>
                   </div>
 
                   <div className="pt-2">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block font-mono mb-1">Código de instalación previsto:</span>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block font-mono mb-1">CÃ³digo de instalaciÃ³n previsto:</span>
                     <div className="bg-slate-950 text-emerald-400 p-3 rounded-2xl text-[9.5px] font-mono leading-relaxed border border-slate-900 select-all overflow-x-auto">
                       {`<!-- AGUADI ZAP 24/7 web conversion script -->
 <script src="https://cloudprop.aguadbienesraices.com.ar/widget/aguadi-zap.js"></script>`}
                     </div>
                     <span className="text-[9px] text-slate-400 block mt-1.5 italic">
-                      Insertar este script después de la etiqueta <code>&lt;header&gt;</code> del sitio web.
+                      Insertar este script despuÃ©s de la etiqueta <code>&lt;header&gt;</code> del sitio web.
                     </span>
                   </div>
                 </div>
@@ -1195,74 +1195,74 @@ export const AguadiCabinetView: React.FC = () => {
               <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-3.5">
                 <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Simulador AGUADI ZAP</strong>
                 <p className="text-slate-400 text-[10px] font-medium leading-relaxed">
-                  Prueba el comportamiento sintético del bot para ver cómo califica y rutea leads en vivo según distintos escenarios:
+                  Prueba el comportamiento sintÃ©tico del bot para ver cÃ³mo califica y rutea leads en vivo segÃºn distintos escenarios:
                 </p>
 
                 <div className="grid grid-cols-2 gap-1.5 text-[10.5px]">
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493815011111');
-                      setSimulatedText('Hola, me llamo Fernando Ortiz, busco una casa grande de 4 dormitorios para comprar en Lomas de Tafí con cochera triple. Presupuesto aproximado USD 120,000.');
+                      setSimulatedText('Hola, me llamo Fernando Ortiz, busco una casa grande de 4 dormitorios para comprar en Lomas de TafÃ­ con cochera triple. Presupuesto aproximado USD 120,000.');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    🏠 Comprador Interesado
+                    ðŸ  Comprador Interesado
                   </button>
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493816222222');
-                      setSimulatedText('Urgente! busco alquilar departamento chico de 1 ambiente cerca de la facultad de medicina en Tucumán centro. Tengo para pagar hasta $120.000.');
+                      setSimulatedText('Urgente! busco alquilar departamento chico de 1 ambiente cerca de la facultad de medicina en TucumÃ¡n centro. Tengo para pagar hasta $120.000.');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    ⚡ Inquilino Urgente
+                    âš¡ Inquilino Urgente
                   </button>
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493817333333');
-                      setSimulatedText('Buenas tardes, mi nombre es Estela Juárez y tengo un duplex de 3 dormitorios en Yerba Buena que quisiera poner a la venta.');
+                      setSimulatedText('Buenas tardes, mi nombre es Estela JuÃ¡rez y tengo un duplex de 3 dormitorios en Yerba Buena que quisiera poner a la venta.');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    💼 Propietario Vendedor
+                    ðŸ’¼ Propietario Vendedor
                   </button>
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493818444444');
-                      setSimulatedText('Hola, busco dar en alquiler mi local comercial en peatonal Muñecas. Tiene 100 metros cuadrados.');
+                      setSimulatedText('Hola, busco dar en alquiler mi local comercial en peatonal MuÃ±ecas. Tiene 100 metros cuadrados.');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    🔑 Propietario Locador
+                    ðŸ”‘ Propietario Locador
                   </button>
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493819555555');
-                      setSimulatedText('Hola, soy inversor de Tucumán y busco lotes rústicos en cantidad para desarrollar un barrio privado cerrado. Presupuesto disponible USD 350.000.');
+                      setSimulatedText('Hola, soy inversor de TucumÃ¡n y busco lotes rÃºsticos en cantidad para desarrollar un barrio privado cerrado. Presupuesto disponible USD 350.000.');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    📈 Inversor
+                    ðŸ“ˆ Inversor
                   </button>
                   <button
                     onClick={() => {
                       setSimulatedPhone('+5493811666666');
-                      setSimulatedText('¿En qué zonas de cobertura atienden y cuáles son sus horarios de oficina?');
+                      setSimulatedText('Â¿En quÃ© zonas de cobertura atienden y cuÃ¡les son sus horarios de oficina?');
                       setActiveTab('simulator');
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    ❓ Consulta General
+                    â“ Consulta General
                   </button>
                 </div>
 
                 <p className="bg-amber-500/5 text-amber-600 border border-amber-500/15 p-2 rounded-2xl text-[9.5px] leading-relaxed font-sans">
-                  ⚠️ <strong>Aviso:</strong> El simulador se comunicará con Gemini cuando el backend seguro de Cloud y las variables de entornos queden completamente enlazadas.
+                  âš ï¸ <strong>Aviso:</strong> El simulador se comunicarÃ¡ con Gemini cuando el backend seguro de Cloud y las variables de entornos queden completamente enlazadas.
                 </p>
               </div>
 
@@ -1272,23 +1272,23 @@ export const AguadiCabinetView: React.FC = () => {
                 
                 <div className="text-xs space-y-1.5 text-slate-600 leading-normal font-sans">
                   <div className="flex items-start space-x-1.5">
-                    <span className="text-teal-500 font-bold shrink-0">✓</span>
+                    <span className="text-teal-500 font-bold shrink-0">âœ“</span>
                     <span>No inventar propiedades inexistentes.</span>
                   </div>
                   <div className="flex items-start space-x-1.5">
-                    <span className="text-teal-500 font-bold shrink-0">✓</span>
-                    <span>No confirmar disponibilidad sin validación previa.</span>
+                    <span className="text-teal-500 font-bold shrink-0">âœ“</span>
+                    <span>No confirmar disponibilidad sin validaciÃ³n previa.</span>
                   </div>
                   <div className="flex items-start space-x-1.5">
-                    <span className="text-teal-500 font-bold shrink-0">✓</span>
-                    <span>No tasar inmuebles en línea de forma sintética.</span>
+                    <span className="text-teal-500 font-bold shrink-0">âœ“</span>
+                    <span>No tasar inmuebles en lÃ­nea de forma sintÃ©tica.</span>
                   </div>
                   <div className="flex items-start space-x-1.5">
-                    <span className="text-teal-500 font-bold shrink-0">✓</span>
+                    <span className="text-teal-500 font-bold shrink-0">âœ“</span>
                     <span>No ofrecer precios estimados de forma deudora.</span>
                   </div>
                   <div className="flex items-start space-x-1.5">
-                    <span className="text-teal-500 font-bold shrink-0">✓</span>
+                    <span className="text-teal-500 font-bold shrink-0">âœ“</span>
                     <span>No cerrar operaciones sin agentes humanos.</span>
                   </div>
                 </div>
@@ -1296,14 +1296,14 @@ export const AguadiCabinetView: React.FC = () => {
 
               {/* Routing Summary */}
               <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-3">
-                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block font-mono">Derivación inteligente</strong>
+                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block font-mono">DerivaciÃ³n inteligente</strong>
                 <div className="text-xs bg-slate-50/50 p-2.5 rounded-2xl dark:bg-slate-850 leading-relaxed text-slate-500 space-y-1 font-sans">
-                  <p><strong>Criterios dinámicos de ruteo:</strong> {routingRules.length} reglas activas</p>
+                  <p><strong>Criterios dinÃ¡micos de ruteo:</strong> {routingRules.length} reglas activas</p>
                   <p className="mt-1">Reglas del contrato:</p>
                   <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
-                    <li>Si la intención es <strong>compra</strong>, derivar a agente Facundo.</li>
-                    <li>Si la intención es <strong>alquiler</strong>, derivar a Marcos Vargas.</li>
-                    <li>Si la intención es de <strong>propietario vendedor</strong>, asignar a agente Senior.</li>
+                    <li>Si la Intención es <strong>compra</strong>, derivar a agente Facundo.</li>
+                    <li>Si la Intención es <strong>alquiler</strong>, derivar a Marcos Vargas.</li>
+                    <li>Si la Intención es de <strong>propietario vendedor</strong>, asignar a agente Senior.</li>
                   </ul>
                 </div>
               </div>
@@ -1325,7 +1325,7 @@ export const AguadiCabinetView: React.FC = () => {
             <div className="space-y-1.5 overflow-y-auto max-h-[500px]">
               {conversations.length === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl dark:border-slate-800">
-                  Ninguna conversación registrada aún. Dispara un saludo abajo.
+                  Ninguna conversación registrada aÃºn. Dispara un saludo abajo.
                 </div>
               ) : (
                 conversations.map((conv) => {
@@ -1441,18 +1441,18 @@ export const AguadiCabinetView: React.FC = () => {
                     className="w-full mt-1 px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800 dark:text-white"
                   >
                     <option value="whatsapp">WhatsApp Cloud API</option>
-                    <option value="widget">Widget Web Público</option>
+                    <option value="widget">Widget Web PÃºblico</option>
                   </select>
                 </div>
                 <div className="col-span-2 lg:col-span-1 flex items-end">
                   <button
                     onClick={() => {
                       setSimulatedPhone('+549381' + Math.floor(1000000 + Math.random() * 9000000));
-                      setSimulatedText('Hola, me llamo Juan Herrera, quiero alquilar un departamento o casa de 2 dormitorios en Barrio Norte (Tucumán) por cerca de $350.000 pesos de presupuesto.');
+                      setSimulatedText('Hola, me llamo Juan Herrera, quiero alquilar un departamento o casa de 2 dormitorios en Barrio Norte (TucumÃ¡n) por cerca de $350.000 pesos de presupuesto.');
                     }}
                     className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] font-bold tracking-tight font-mono transition uppercase cursor-pointer dark:bg-slate-800 dark:text-slate-350 dark:hover:bg-slate-700"
                   >
-                    🎲 Cargar Aleatorio
+                    ðŸŽ² Cargar Aleatorio
                   </button>
                 </div>
               </div>
@@ -1464,14 +1464,14 @@ export const AguadiCabinetView: React.FC = () => {
                     rows={2}
                     value={simulatedText}
                     onChange={(e) => setSimulatedText(e.target.value)}
-                    placeholder="Escriba aquí la frase coloquial del cliente interesado..."
+                    placeholder="Escriba aquÃ­ la frase coloquial del cliente interesado..."
                     className="w-full pl-3 pr-12 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all dark:border-slate-800 dark:bg-slate-800 dark:text-white"
                   />
                   <button
                     onClick={handleSimulateIncoming}
                     disabled={submitting || !simulatedText.trim()}
                     className="absolute right-2 bottom-3 p-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl hover:opacity-95 shadow-md shadow-teal-500/10 cursor-pointer disabled:opacity-40 transition-opacity"
-                    title="Simular Envío"
+                    title="Simular EnvÃ­o"
                   >
                     {submitting ? (
                       <RefreshCw className="animate-spin w-4.5 h-4.5" />
@@ -1489,7 +1489,7 @@ export const AguadiCabinetView: React.FC = () => {
             
             {/* Qualification Panel Card */}
             <div className="bg-white rounded-3xl border border-slate-100 p-4.5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase block">Análisis de Lead en Vivo</h2>
+              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase block">AnÃ¡lisis de Lead en Vivo</h2>
               
               {/* Score Meter Ring */}
               <div className="flex flex-col items-center py-2 text-center">
@@ -1513,7 +1513,7 @@ export const AguadiCabinetView: React.FC = () => {
                   </div>
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider mt-3 uppercase border ${getScoreBadgeColor(selectedLead?.score || 0)}`}>
-                  {(selectedLead?.score || 0) >= 70 ? '🟢 Lead Calificado' : (selectedLead?.score || 0) >= 40 ? '🟡 En Captura' : '🔴 Frío / Incompleto'}
+                  {(selectedLead?.score || 0) >= 70 ? 'ðŸŸ¢ Lead Calificado' : (selectedLead?.score || 0) >= 40 ? 'ðŸŸ¡ En Captura' : 'ðŸ”´ FrÃ­o / Incompleto'}
                 </span>
               </div>
 
@@ -1524,7 +1524,7 @@ export const AguadiCabinetView: React.FC = () => {
                   <strong className="text-slate-900 dark:text-white font-bold truncate max-w-[120px]">{selectedLead?.fullName || 'Pendiente'}</strong>
                 </div>
                 <div className="flex justify-between items-center bg-slate-50/50 p-2 rounded-xl dark:bg-slate-800/10">
-                  <span className="font-mono text-[9px] text-slate-400 uppercase font-bold">Operación</span>
+                  <span className="font-mono text-[9px] text-slate-400 uppercase font-bold">operación</span>
                   <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 font-bold uppercase text-[9px] tracking-tight">
                     {selectedLead?.operationType || 'No detectada'}
                   </span>
@@ -1556,13 +1556,13 @@ export const AguadiCabinetView: React.FC = () => {
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                 <span className="text-[9px] font-black font-mono tracking-widest text-slate-400 uppercase block mb-1">Resumen IA (AI Briefing)</span>
                 <p className="text-slate-500/90 leading-relaxed text-[11px] bg-slate-50 p-2 rounded-xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800/50 max-h-[100px] overflow-y-auto">
-                  {selectedLead?.aiSummary || 'Deduciendo contexto de la conversación... El bot interactivo intentará estructurar un informe en este espacio.'}
+                  {selectedLead?.aiSummary || 'Deduciendo contexto de la conversación... El bot interactivo intentarÃ¡ estructurar un informe en este espacio.'}
                 </p>
               </div>
 
               {/* Next best action recommendation */}
               <div className="pt-1 text-xs">
-                <span className="text-[9px] font-black font-mono tracking-widest text-slate-400 uppercase block mb-1">Acción Intelectiva Recomendada</span>
+                <span className="text-[9px] font-black font-mono tracking-widest text-slate-400 uppercase block mb-1">AcciÃ³n Intelectiva Recomendada</span>
                 <p className="text-teal-600 leading-normal text-[11px] font-bold bg-teal-500/5 p-2 rounded-xl border border-teal-100/30 flex items-start space-x-2">
                   <Sparkles className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
                   <span>{selectedLead?.nextBestAction || 'Interpolar variables para predecir la mejor tarea comercial.'}</span>
@@ -1586,8 +1586,8 @@ export const AguadiCabinetView: React.FC = () => {
           {leads.length === 0 ? (
             <div className="p-12 text-center text-slate-400 border border-dashed border-slate-100 rounded-3xl dark:border-slate-800">
               <Bot className="w-12 h-12 text-slate-300 mx-auto opacity-40 mb-3" />
-              <p className="text-sm font-semibold uppercase tracking-wider font-mono">No hay leads capturados en esta ventana bilingüe</p>
-              <p className="text-xs text-slate-400 mt-2">Visita el simulador para ingresar interacciones piloto que Gemini clasificará de forma analítica en Firestore.</p>
+              <p className="text-sm font-semibold uppercase tracking-wider font-mono">No hay leads capturados en esta ventana bilingÃ¼e</p>
+              <p className="text-xs text-slate-400 mt-2">Visita el simulador para ingresar interacciones piloto que Gemini clasificarÃ¡ de forma analÃ­tica en Firestore.</p>
             </div>
           ) : (
             <div className="overflow-x-auto min-w-full">
@@ -1595,9 +1595,9 @@ export const AguadiCabinetView: React.FC = () => {
                 <thead>
                   <tr className="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-mono tracking-wider bg-slate-50/50 dark:bg-slate-850 dark:border-slate-800">
                     <th className="p-3">Nombre Lead / Teléfono</th>
-                    <th className="p-3">Operación / Inmueble</th>
+                    <th className="p-3">operación / Inmueble</th>
                     <th className="p-3">Zona preferida</th>
-                    <th className="p-3">Calificación (Score)</th>
+                    <th className="p-3">CalificaciÃ³n (Score)</th>
                     <th className="p-3">Presupuesto</th>
                     <th className="p-3">Canal</th>
                     <th className="p-3">Agente asignado</th>
@@ -1671,9 +1671,9 @@ export const AguadiCabinetView: React.FC = () => {
           
           {/* Rules Left Column: Assignment rules CRUD (6 cols) */}
           <div className="lg:col-span-6 bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Motor de Asignación y Ruteo de Leads</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Motor de AsignaciÃ³n y Ruteo de Leads</h2>
             <p className="text-slate-400 text-xs font-medium leading-normal">
-              Reglas lógicas dinámicas aplicadas al instante de calificar un lead. Si cumple los criterios, se deriva al agente respectivo.
+              Reglas lÃ³gicas dinÃ¡micas aplicadas al instante de calificar un lead. Si cumple los criterios, se deriva al agente respectivo.
             </p>
 
             {/* Rule form */}
@@ -1688,7 +1688,7 @@ export const AguadiCabinetView: React.FC = () => {
                     placeholder="Ej: Terrenos Yerba Buena"
                     value={newRuleName}
                     onChange={(e) => setNewRuleName(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-8次 dark:bg-slate-800"
+                    className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-8æ¬¡ dark:bg-slate-800"
                   />
                 </div>
                 <div>
@@ -1698,7 +1698,7 @@ export const AguadiCabinetView: React.FC = () => {
                     onChange={(e) => setNewRuleAgent(e.target.value)}
                     className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800"
                   >
-                    <option value="agent-default">Clasificación Tradicional (Default)</option>
+                    <option value="agent-default">ClasificaciÃ³n Tradicional (Default)</option>
                     <option value="agent-facundo">Facundo Aguad (Alta Gama)</option>
                     <option value="agent-vargas">Marcos Vargas (Alquileres)</option>
                     <option value="agent-terrenos">Dpto Lotes (Terrenos)</option>
@@ -1711,9 +1711,9 @@ export const AguadiCabinetView: React.FC = () => {
                     onChange={(e: any) => setNewRuleType(e.target.value)}
                     className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800"
                   >
-                    <option value="operationType">Tipo Operación (compra, venta...)</option>
+                    <option value="operationType">Tipo operación (compra, venta...)</option>
                     <option value="propertyType">Tipo Inmueble (casa, departamento...)</option>
-                    <option value="zone">Zona Geográfica (Yerba Buena, Barrio Norte...)</option>
+                    <option value="zone">Zona GeogrÃ¡fica (Yerba Buena, Barrio Norte...)</option>
                   </select>
                 </div>
                 <div>
@@ -1784,12 +1784,12 @@ export const AguadiCabinetView: React.FC = () => {
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
               <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Directrices de Entrenamiento de IA (Context Injection)</h2>
               <p className="text-slate-400 text-xs font-medium leading-normal">
-                Regula e inyecta respuestas institucionales que Gemini adoptará si el cliente menciona temas específicos (ej: tarifas, turnos, comisiones).
+                Regula e inyecta respuestas institucionales que Gemini adoptarÃ¡ si el cliente menciona temas especÃ­ficos (ej: tarifas, turnos, comisiones).
               </p>
 
               {/* Training Rule form */}
               <form onSubmit={handleSaveTrainingRule} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800 space-y-3.5">
-                <strong className="text-[10px] font-black text-slate-400 uppercase tracking-widest block font-mono">Inyectar Pauta Lingüística</strong>
+                <strong className="text-[10px] font-black text-slate-400 uppercase tracking-widest block font-mono">Inyectar Pauta LingÃ¼Ã­stica</strong>
                 <div className="space-y-2 text-xs">
                   <div>
                     <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">Palabra clave o Tema detonante</label>
@@ -1803,11 +1803,11 @@ export const AguadiCabinetView: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">Instrucción de Respuesta (Directiva para el robot)</label>
+                    <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">InstrucciÃ³n de Respuesta (Directiva para el robot)</label>
                     <textarea
                       required
                       rows={2}
-                      placeholder="Ej: Explicar cordialmente que cobramos el 3% de honorarios de venta y ofrece agendar tasación."
+                      placeholder="Ej: Explicar cordialmente que cobramos el 3% de honorarios de venta y ofrece agendar tasaciÃ³n."
                       value={newTrainInstruction}
                       onChange={(e) => setNewTrainInstruction(e.target.value)}
                       className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800"
@@ -1828,7 +1828,7 @@ export const AguadiCabinetView: React.FC = () => {
               {/* Training Rules list */}
               <div className="space-y-2">
                 {trainingRules.length === 0 ? (
-                  <p className="p-4 text-center text-xs border border-dashed border-slate-100 rounded-xl text-slate-400">Sin directrices específicas. AGUADI ZAP responde libremente bajo ética profesional.</p>
+                  <p className="p-4 text-center text-xs border border-dashed border-slate-100 rounded-xl text-slate-400">Sin directrices especÃ­ficas. AGUADI ZAP responde libremente bajo Ã©tica profesional.</p>
                 ) : (
                   trainingRules.map((r) => (
                     <div key={r.ruleId} className="flex justify-between items-start p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
@@ -1852,16 +1852,16 @@ export const AguadiCabinetView: React.FC = () => {
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
               <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Plantillas Oficiales de Respuesta (Institutional Material)</h2>
               <p className="text-slate-400 text-xs font-medium leading-normal">
-                Define bloques oficiales y párrafos comerciales redactados de la inmobiliaria. Gemini utilizará estos para complementar las respuestas.
+                Define bloques oficiales y pÃ¡rrafos comerciales redactados de la inmobiliaria. Gemini utilizarÃ¡ estos para complementar las respuestas.
               </p>
 
               {/* Template form */}
               <form onSubmit={handleSaveTemplate} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800 space-y-3.5">
-                <strong className="text-[10px] font-black text-slate-400 uppercase tracking-widest block font-mono">Añadir Plantilla Comercial</strong>
+                <strong className="text-[10px] font-black text-slate-400 uppercase tracking-widest block font-mono">AÃ±adir Plantilla Comercial</strong>
                 <div className="space-y-2 text-xs">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">Título de Plantilla</label>
+                      <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">TÃ­tulo de Plantilla</label>
                       <input
                         type="text"
                         required
@@ -1872,7 +1872,7 @@ export const AguadiCabinetView: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">Categoría</label>
+                      <label className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider mb-1">CategorÃ­a</label>
                       <input
                         type="text"
                         required
@@ -1888,7 +1888,7 @@ export const AguadiCabinetView: React.FC = () => {
                     <textarea
                       required
                       rows={2}
-                      placeholder="Redacte aquí el texto oficial que se le enviará..."
+                      placeholder="Redacte aquÃ­ el texto oficial que se le enviarÃ¡..."
                       value={newTplText}
                       onChange={(e) => setNewTplText(e.target.value)}
                       className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl"
@@ -1946,7 +1946,7 @@ export const AguadiCabinetView: React.FC = () => {
             
             {/* General AGUADI ZAP parameters form */}
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800">
-              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase mb-4 block">Parámetros Operacionales del Robot</h2>
+              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase mb-4 block">ParÃ¡metros Operacionales del Robot</h2>
               
               {settings && (
                 <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
@@ -1978,7 +1978,7 @@ export const AguadiCabinetView: React.FC = () => {
                         onChange={(e: any) => setSettings({ ...settings, tone: e.target.value })}
                         className="w-full px-3.5 py-2 border border-slate-200 bg-slate-50 rounded-xl"
                       >
-                        <option value="warm">Cálido y empático (Recomendado)</option>
+                        <option value="warm">CÃ¡lido y empÃ¡tico (Recomendado)</option>
                         <option value="professional">Profesional y asertivo</option>
                         <option value="formal">Formal y corporativo</option>
                       </select>
@@ -1990,7 +1990,7 @@ export const AguadiCabinetView: React.FC = () => {
                         onChange={(e) => setSettings({ ...settings, defaultAgentId: e.target.value })}
                         className="w-full px-3.5 py-2 border border-slate-200 bg-slate-50 rounded-xl"
                       >
-                        <option value="agent-default">Clasificación Tradicional (Default)</option>
+                        <option value="agent-default">ClasificaciÃ³n Tradicional (Default)</option>
                         <option value="agent-facundo">Facundo Aguad (Alta Gama)</option>
                         <option value="agent-vargas">Marcos Vargas (Alquileres)</option>
                       </select>
@@ -2010,7 +2010,7 @@ export const AguadiCabinetView: React.FC = () => {
                         />
                         <div>
                           <strong className="text-[11px] block text-slate-700">Robot Generativo ACTIVO</strong>
-                          <span className="text-[9px] text-slate-400 block -mt-0.5">Permite procesar respuestas automáticas por IA.</span>
+                          <span className="text-[9px] text-slate-400 block -mt-0.5">Permite procesar respuestas automÃ¡ticas por IA.</span>
                         </div>
                       </label>
 
@@ -2022,7 +2022,7 @@ export const AguadiCabinetView: React.FC = () => {
                           className="w-4 h-4 text-teal-600 focus:ring-0"
                         />
                         <div>
-                          <strong className="text-[11px] block text-slate-700">Integración con WhatsApp</strong>
+                          <strong className="text-[11px] block text-slate-700">IntegraciÃ³n con WhatsApp</strong>
                           <span className="text-[9px] text-slate-400 block -mt-0.5">Permite conectar con WhatsApp Cloud API webhook.</span>
                         </div>
                       </label>
@@ -2035,7 +2035,7 @@ export const AguadiCabinetView: React.FC = () => {
                       disabled={submitting}
                       className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl text-xs font-bold hover:opacity-95 shadow-md shadow-teal-500/10 cursor-pointer"
                     >
-                      Grabar Parámetros Operacionales
+                      Grabar ParÃ¡metros Operacionales
                     </button>
                   </div>
                 </form>
@@ -2044,13 +2044,13 @@ export const AguadiCabinetView: React.FC = () => {
 
             {/* Embeddable chat widget styling config */}
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800">
-              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase mb-4 block">Estilos Visuales del Widget Público</h2>
+              <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase mb-4 block">Estilos Visuales del Widget PÃºblico</h2>
               
               {widgetConfig && (
                 <form onSubmit={handleSaveWidgetConfig} className="space-y-4 text-xs">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block tracking-wider mb-1">Título del Encabezado</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase block tracking-wider mb-1">TÃ­tulo del Encabezado</label>
                       <input 
                         type="text" 
                         required
@@ -2060,7 +2060,7 @@ export const AguadiCabinetView: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block tracking-wider mb-1">Texto del botón flotante</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase block tracking-wider mb-1">Texto del botÃ³n flotante</label>
                       <input 
                         type="text" 
                         required
@@ -2131,7 +2131,7 @@ export const AguadiCabinetView: React.FC = () => {
                       disabled={submitting}
                       className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl text-xs font-bold hover:opacity-95 shadow-md shadow-teal-500/10 cursor-pointer"
                     >
-                      Grabar Configuración de Widget
+                      Grabar configuración de Widget
                     </button>
                   </div>
                 </form>
@@ -2166,7 +2166,7 @@ export const AguadiCabinetView: React.FC = () => {
                             <img src={widgetConfig.botAvatarUrl} className="w-6.5 h-6.5 rounded-full border border-white/20 shadow" />
                             <div>
                               <h4 className="text-[10px] font-bold leading-none">{widgetConfig.visibleName}</h4>
-                              <span className="text-[7.5px] text-teal-300 block font-mono font-bold uppercase mt-0.5 animate-pulse">● En Línea 24/7</span>
+                              <span className="text-[7.5px] text-teal-300 block font-mono font-bold uppercase mt-0.5 animate-pulse">â— En LÃ­nea 24/7</span>
                             </div>
                           </div>
                           <button onClick={() => setWidgetPreviewOpen(false)} className="text-white hover:opacity-75">
@@ -2251,15 +2251,15 @@ export const AguadiCabinetView: React.FC = () => {
           
           {/* Timeline events panel (8 cols) */}
           <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Bitácora Técnica de Eventos AGUADI ZAP</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">BitÃ¡cora TÃ©cnica de Eventos AGUADI ZAP</h2>
             <p className="text-slate-400 text-xs font-medium leading-normal">
-              Flujo real registrado de triggers de webhook, resoluciones de clasificación lingüística del bot, derivaciones completas y fallos de API.
+              Flujo real registrado de triggers de webhook, resoluciones de clasificaciÃ³n lingÃ¼Ã­stica del bot, derivaciones completas y fallos de API.
             </p>
 
             <div className="relative border-l-2 border-slate-100 dark:border-slate-800 pl-4 space-y-5 overflow-y-auto max-h-[420px] pr-2">
               {telemetryEvents.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-400 border border-dashed rounded-xl border-slate-100">
-                  Ningún evento registrado aún. Dispare mensajes simulados para iniciar de forma técnica la bitácora.
+                  NingÃºn evento registrado aÃºn. Dispare mensajes simulados para iniciar de forma tÃ©cnica la bitÃ¡cora.
                 </div>
               ) : (
                 telemetryEvents.map((evt) => {
@@ -2297,7 +2297,7 @@ export const AguadiCabinetView: React.FC = () => {
 
           {/* Integration variables / Credentials (4 cols) */}
           <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Credenciales & Configuración Cloud</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Credenciales & configuración Cloud</h2>
             <p className="text-slate-400 text-xs font-medium leading-normal">
               Estado de las variables de entorno inyectadas en Cloud. La plataforma gestiona las claves de forma segura tras bambalinas.
             </p>
@@ -2311,7 +2311,7 @@ export const AguadiCabinetView: React.FC = () => {
                 <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider font-mono border ${
                   process.env.GEMINI_API_KEY ? 'bg-emerald-50 text-emerald-600 border-teal-100' : 'bg-amber-50 text-amber-600 border-amber-100'
                 }`}>
-                  {process.env.GEMINI_API_KEY ? '✓ Activa (Auto)' : '✓ Lista (Workspace)'}
+                  {process.env.GEMINI_API_KEY ? 'âœ“ Activa (Auto)' : 'âœ“ Lista (Workspace)'}
                 </span>
               </div>
 
@@ -2335,7 +2335,7 @@ export const AguadiCabinetView: React.FC = () => {
                 <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider font-mono border ${
                   process.env.WHATSAPP_PHONE_NUMBER_ID ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-400'
                 }`}>
-                  {process.env.WHATSAPP_PHONE_NUMBER_ID ? '✓ Configurado' : 'Consola local'}
+                  {process.env.WHATSAPP_PHONE_NUMBER_ID ? 'âœ“ Configurado' : 'Consola local'}
                 </span>
               </div>
 
@@ -2354,7 +2354,7 @@ export const AguadiCabinetView: React.FC = () => {
               <ShieldCheck className="w-5 h-5 text-teal-500 shrink-0 mb-1.5" />
               <strong className="text-[10px] block font-bold leading-tight">Privacidad y Seguridad Corporativa:</strong>
               <p className="text-[10px] text-slate-500 mt-1 leading-normal">
-                Las conversaciones ingresadas por clientes permanecen aisladas lógicamente por organización. No se exponen datos de leads en respuestas sintéticas generales.
+                Las conversaciones ingresadas por clientes permanecen aisladas lÃ³gicamente por organizaciÃ³n. No se exponen datos de leads en respuestas sintÃ©ticas generales.
               </p>
             </div>
           </div>
@@ -2365,3 +2365,4 @@ export const AguadiCabinetView: React.FC = () => {
     </div>
   );
 };
+
