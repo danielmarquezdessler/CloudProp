@@ -52,6 +52,9 @@ export interface AguadiGeminiOutput {
  * Helper to fetch or create AGUADI ZAP base settings for an organization
  */
 export async function getOrCreateAguadiSettings(orgId: string): Promise<any> {
+  if (!orgId) {
+    throw new Error("Falta orgId. No se usará fallback de organización.");
+  }
   const db = getFirestoreAdmin();
   const settingsRef = db.collection(AGUADI_COLLECTIONS.settings).doc(orgId);
   const snapshot = await settingsRef.get();
@@ -86,6 +89,9 @@ export async function getOrCreateAguadiSettings(orgId: string): Promise<any> {
  * Helper to fetch or create Widget Config for an organization
  */
 export async function getOrCreateWidgetConfig(orgId: string): Promise<any> {
+  if (!orgId) {
+    throw new Error("Falta orgId. No se usará fallback de organización.");
+  }
   const db = getFirestoreAdmin();
   const configRef = db.collection(AGUADI_COLLECTIONS.widgetConfigs).doc(orgId);
   const snapshot = await configRef.get();
@@ -342,8 +348,11 @@ export async function processIncomingMessage(
   fromPhone: string,
   text: string,
   channel: 'whatsapp' | 'widget',
-  orgId: string = AGUADI_ZAP_DEFAULT_ORG_ID
+  orgId: string
 ): Promise<{ reply: string; conversationId: string; classification: any; leadCreatedOrUpdated: boolean }> {
+  if (!orgId) {
+    throw new Error("Falta orgId. No se usará fallback de organización.");
+  }
   
   const db = getFirestoreAdmin();
   const conversationId = `${channel}_${fromPhone.replace(/\D/g, '')}`;

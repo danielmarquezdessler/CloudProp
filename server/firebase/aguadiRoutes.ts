@@ -17,6 +17,14 @@ const router = Router();
 const AGUADI_COLLECTIONS = LEGACY_AGUADI_COLLECTIONS;
 void AGUADI_ZAP_COLLECTIONS;
 
+const requireProfileOrgId = (profile: any): string => {
+  const orgId = profile?.orgId;
+  if (!orgId) {
+    throw new Error("Falta orgId en el perfil autenticado. AGUADI ZAP no usará fallback de organización.");
+  }
+  return orgId;
+};
+
 // Middleware to authorize AGUADI ZAP access.
 const requireAguadiStaff = async (req: any, res: any, next: any) => {
   const callerUid = req.headers['x-user-uid'] || (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].split(' ')[1] : null);
@@ -48,16 +56,6 @@ const requireAguadiStaff = async (req: any, res: any, next: any) => {
   } catch (error: any) {
     return res.status(500).json({ success: false, error: "Error de autorización de AGUADI: " + error.message });
   }
-};
-
-const getCallerOrgId = (req: any) => {
-  const orgId = req.callerProfile?.orgId;
-  if (!orgId) {
-    const error: any = new Error("Falta orgId en el perfil autenticado. AGUADI ZAP no usará fallback de organización.");
-    error.statusCode = 400;
-    throw error;
-  }
-  return orgId;
 };
 
 /**
@@ -140,7 +138,10 @@ router.post("/aguadi/simulate-incoming", async (req, res) => {
   }
 
   const targetChannel = channel === 'widget' ? 'widget' : 'whatsapp';
-  const targetOrg = orgId || AGUADI_ZAP_DEFAULT_ORG_ID;
+  if (!orgId) {
+    return res.status(400).json({ success: false, error: "Falta orgId para ejecutar el simulador. No se usará fallback de organización." });
+  }
+  const targetOrg = orgId;
 
   try {
     const result = await processIncomingMessage(phone, text, targetChannel, targetOrg);
@@ -164,7 +165,7 @@ router.get("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const [settings, widget, rulesSnap, trainingSnap, templatesSnap] = await Promise.all([
       getOrCreateAguadiSettings(orgId),
       getOrCreateWidgetConfig(orgId),
@@ -203,7 +204,7 @@ router.post("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const ref = db.collection(AGUADI_COLLECTIONS.settings).doc(orgId);
     const updatedPayload = {
       ...updates,
@@ -229,7 +230,7 @@ router.post("/aguadi/widget-config", requireAguadiStaff, async (req: any, res) =
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const ref = db.collection(AGUADI_COLLECTIONS.widgetConfigs).doc(orgId);
     const updatedPayload = {
       ...updates,
@@ -253,7 +254,7 @@ router.get("/aguadi/conversations", requireAguadiStaff, async (req: any, res) =>
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const snap = await db.collection(AGUADI_COLLECTIONS.conversations)
       .where('orgId', '==', orgId)
       .orderBy('lastMessageAt', 'desc')
@@ -298,7 +299,7 @@ router.get("/aguadi/leads", requireAguadiStaff, async (req: any, res) => {
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const snap = await db.collection(AGUADI_COLLECTIONS.leads)
       .where('orgId', '==', orgId)
       .orderBy('createdAt', 'desc')
@@ -320,7 +321,7 @@ router.get("/aguadi/metrics", requireAguadiStaff, async (req: any, res) => {
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const [eventsSnap, metricsSnap, leadsSnap, convsSnap] = await Promise.all([
       db.collection(AGUADI_COLLECTIONS.events).where('orgId', '==', orgId).orderBy('timestamp', 'desc').limit(50).get(),
       db.collection(AGUADI_COLLECTIONS.metricsDaily).where('orgId', '==', orgId).orderBy('date', 'desc').limit(15).get(),
@@ -369,7 +370,7 @@ router.post("/aguadi/routing-rules/save", requireAguadiStaff, async (req: any, r
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const ruleId = id || db.collection(AGUADI_COLLECTIONS.routingRules).doc().id;
     const ref = db.collection(AGUADI_COLLECTIONS.routingRules).doc(ruleId);
     
@@ -415,7 +416,7 @@ router.post("/aguadi/training-rules/save", requireAguadiStaff, async (req: any, 
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const ruleId = id || db.collection(AGUADI_COLLECTIONS.trainingRules).doc().id;
     const ref = db.collection(AGUADI_COLLECTIONS.trainingRules).doc(ruleId);
     
@@ -456,7 +457,7 @@ router.post("/aguadi/response-templates/save", requireAguadiStaff, async (req: a
   const db = getFirestoreAdmin();
 
   try {
-    const orgId = getCallerOrgId(req);
+    const orgId = requireProfileOrgId(req.callerProfile);
     const templateId = id || db.collection(AGUADI_COLLECTIONS.responseTemplates).doc().id;
     const ref = db.collection(AGUADI_COLLECTIONS.responseTemplates).doc(templateId);
     

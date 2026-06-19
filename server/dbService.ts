@@ -12,110 +12,33 @@ interface DatabaseSchema {
   passwords: Record<string, string>; // Maps email.toLowerCase() -> password string
 }
 
-const DEFAULT_DB: DatabaseSchema = {
+const createEmptyLocalDb = (): DatabaseSchema => ({
   users: [],
   passwords: {},
-  properties: [
-    {
-      id: "prop-1",
-      title: "Casa de Lujo en Nordelta",
-      description: "Espectacular casa minimalista frente al lago. Piscina climatizada, 4 master suites, acabados premium de mármol y sistema de domótica instalado.",
-      type: "house",
-      price: 850000,
-      address: "Av. del Lago 1400, Nordelta, Tigre",
-      status: "available",
-      bedrooms: 4,
-      bathrooms: 5,
-      areaSqM: 450,
-      imageUrl: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      orgId: "aguad-corp",
-      createdBy: "admin-uid-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "prop-2",
-      title: "Penthouse de Diseño en Palermo Chico",
-      description: "Exclusivo departamento en piso alto con vistas panorámicas al río y bosques de Palermo. Terraza privada con jacuzzi, 3 cocheras cubiertas.",
-      type: "apartment",
-      price: 1200000,
-      address: "Av. Del Libertador 3200, Palermo, CABA",
-      status: "available",
-      bedrooms: 3,
-      bathrooms: 4,
-      areaSqM: 280,
-      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
-      orgId: "aguad-corp",
-      createdBy: "admin-uid-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "prop-3",
-      title: "Oficina Corporativa Catalinas",
-      description: "Planta libre corporativa en torre de categoría AAA. Certificación LEED, vistas al río, seguridad 24 hs y 4 cocheras privadas.",
-      type: "commercial",
-      price: 450000,
-      address: "Avenida Leandro N. Alem 850, Retiro, CABA",
-      status: "reserved",
-      bedrooms: 0,
-      bathrooms: 2,
-      areaSqM: 180,
-      imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
-      orgId: "aguad-corp",
-      createdBy: "admin-uid-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "prop-4",
-      title: "Terreno Residencial en San Isidro Chic",
-      description: "Lote arbolado ideal para desarrollo de vivienda unifamiliar en excelente zona de San Isidro. Listo para escriturar, servicios subterráneos.",
-      type: "land",
-      price: 320000,
-      address: "Primera Junta 450, San Isidro, GBA Norte",
-      status: "available",
-      bedrooms: 0,
-      bathrooms: 0,
-      areaSqM: 800,
-      imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
-      orgId: "aguad-corp",
-      createdBy: "agent-uid-2",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  ],
-  auditLogs: [
-    {
-      id: "log-seed-1",
-      userId: "system",
-      userEmail: "system@aguadbienesraices.com.ar",
-      action: "login",
-      details: "Base de datos inicializada y cargada con estructura seed de producción.",
-      timestamp: new Date().toISOString()
-    }
-  ]
-};
+  properties: [],
+  auditLogs: []
+});
 
 // Safe File I/O helpers
 function readDb(): DatabaseSchema {
   // Strict Security Isolation check
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("[PROD_SECURITY_VIOLATION] Prohibido utilizar datastore de simulación local (DEFAULT_DB / database.json) en ambiente de producción real de Cloud-Prop Suite.");
+  if (process.env.NODE_ENV === "production" || !!process.env.K_SERVICE) {
+    throw new Error("[PROD_SECURITY_VIOLATION] Prohibido utilizar datastore local (data/database.json) en ambiente de producción real de Cloud-Prop Suite.");
   }
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     if (!fs.existsSync(DB_FILE)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf-8');
-      return DEFAULT_DB;
+      const emptyDb = createEmptyLocalDb();
+      fs.writeFileSync(DB_FILE, JSON.stringify(emptyDb, null, 2), 'utf-8');
+      return emptyDb;
     }
     const data = fs.readFileSync(DB_FILE, 'utf-8');
     return JSON.parse(data);
   } catch (err) {
     console.error('Error reading project database file:', err);
-    return DEFAULT_DB;
+    throw new Error("No se pudo abrir el datastore local de desarrollo. No se usará fallback automático.");
   }
 }
 
@@ -277,8 +200,15 @@ export function createUserAccount(
 
   const newUid = `user-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
-  // Create Auth-equivalent in system (saving credentials securely)
-  db.passwords[normEmail] = userFields.passwordString || "Password123!";
+  if (!userFields.passwordString) {
+    return { success: false, error: "La creación local requiere contraseña explícita. No se asignan contraseñas por defecto." };
+  }
+  if (!userFields.orgId && !caller.orgId) {
+    return { success: false, error: "Falta orgId del usuario autenticado. No se usará fallback de organización." };
+  }
+
+  // Create Auth-equivalent in local development only
+  db.passwords[normEmail] = userFields.passwordString;
 
   // Create users/{uid} collection equivalent
   const newUser: User = {
@@ -287,7 +217,7 @@ export function createUserAccount(
     displayName: userFields.displayName,
     role: userFields.role,
     status: userFields.status || 'active',
-    orgId: userFields.orgId || caller.orgId || 'aguad-corp',
+    orgId: userFields.orgId || caller.orgId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     createdBy: caller.uid,
@@ -326,6 +256,9 @@ export function repairUserAccess(callerUid: string, targetEmail: string, repairO
 
   if (status.consistencyStatus === 'auth_only') {
     // Auth exists but no profile. Let's create profile.
+    if (!caller.orgId) {
+      return { success: false, message: "Falta orgId del administrador autenticado. No se usará fallback de organización." };
+    }
     const newUid = `user-repaired-${Date.now()}`;
     const newUser: User = {
       uid: newUid,
@@ -333,7 +266,7 @@ export function repairUserAccess(callerUid: string, targetEmail: string, repairO
       displayName: normEmail.split('@')[0],
       role: 'client',
       status: 'active',
-      orgId: 'aguad-corp',
+      orgId: caller.orgId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: caller.uid,
@@ -347,11 +280,7 @@ export function repairUserAccess(callerUid: string, targetEmail: string, repairO
   }
 
   if (status.consistencyStatus === 'firestore_only') {
-    // Profiler exists but no Auth. Assign password.
-    db.passwords[normEmail] = "Passwordrepaired123!";
-    writeDb(db);
-    logAudit(caller.uid, caller.email, 'update', `Reparación: Credenciales regeneradas para perfil sin Auth (${normEmail})`);
-    return { success: true, message: `Perfil reparado para ${normEmail}. Nueva contraseña asignada: Passwordrepaired123!` };
+    return { success: false, message: "Perfil sin credenciales detectado. La reparación debe realizarse desde backend seguro con Firebase Admin SDK, sin contraseñas hardcodeadas." };
   }
 
   return { success: false, message: "No se pudo diagnosticar una vía de reparación directa." };
@@ -484,6 +413,9 @@ export function createProperty(
   if (!caller || (caller.role !== 'super_admin' && caller.role !== 'agent')) {
     return { success: false, error: "Acceso denegado: Se requiere rol de Agente de Ventas o Administrador." };
   }
+  if (!caller.orgId) {
+    return { success: false, error: "Falta orgId del usuario autenticado. No se usará fallback de organización." };
+  }
 
   const newProperty: Property = {
     id: `prop-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -497,7 +429,7 @@ export function createProperty(
     bathrooms: Number(fields.bathrooms),
     areaSqM: Number(fields.areaSqM),
     imageUrl: fields.imageUrl || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80",
-    orgId: caller.orgId || "aguad-corp", // Rule 11: Must use organization from authenticated user
+    orgId: caller.orgId,
     createdBy: caller.uid,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
