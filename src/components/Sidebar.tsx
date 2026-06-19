@@ -14,6 +14,7 @@ import {
   Bot
 } from 'lucide-react';
 import { Language } from '../i18n';
+import { AGUADI_ZAP_MODULE_NAME, AGUADI_ZAP_PERMISSIONS } from '../../shared/aguadiZap';
 
 interface SidebarProps {
   currentTab: string;
@@ -52,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       key: 'aguadi',
-      label: 'Cabina AGUADI 24/7',
+      label: AGUADI_ZAP_MODULE_NAME,
       icon: Bot,
       roles: ['super_admin', 'agent']
     },
@@ -124,12 +125,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {menuItems.map((item) => {
             let hasPermission = item.roles.includes(user.role);
 
-            // Respect precise permission directives for AGUADI conversion dashboard module
+            // Respect precise permission directives for AGUADI ZAP conversion module.
             if (item.key === 'aguadi') {
               hasPermission = 
                 user.role === 'super_admin' || 
                 (user.permissions && user.permissions.includes('*')) || 
-                (user.permissions && user.permissions.includes('aguadi.view'));
+                (user.permissions && user.permissions.includes(AGUADI_ZAP_PERMISSIONS.legacyView)) ||
+                (user.permissions && user.permissions.includes(AGUADI_ZAP_PERMISSIONS.view));
             }
 
             if (!hasPermission) return null;

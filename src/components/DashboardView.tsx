@@ -25,6 +25,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { User, Property, AuditLog } from '../types';
+import { AGUADI_ZAP_DISPLAY_NAME, AGUADI_ZAP_MODULE_NAME } from '../../shared/aguadiZap';
 
 interface DashboardViewProps {
   onNavigate?: (tab: string) => void;
@@ -822,7 +823,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* BENTO SIDE COLUMN: CABINA AGUADI MONITOR & SHIFT LINK */}
+            {/* AGUADI ZAP monitor and navigation link */}
             <div className="bg-gradient-to-br from-slate-950 to-slate-900 text-white rounded-3xl p-6 border border-slate-900 shadow-lg flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-850">
@@ -831,8 +832,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                       <Activity className="w-4.5 h-4.5" />
                     </div>
                     <div>
-                      <h3 className="text-xs font-bold text-white uppercase tracking-tight leading-none">Cabina AGUADI 24/7</h3>
-                      <span className="text-[9px] font-mono text-teal-400 font-bold block mt-0.5">Asistente Autónomo Activo</span>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-tight leading-none">{AGUADI_ZAP_MODULE_NAME}</h3>
+                      <span className="text-[9px] font-mono text-teal-400 font-bold block mt-0.5">Conversión WhatsApp 24/7</span>
                     </div>
                   </div>
                   <span className="bg-teal-950/40 text-teal-400 border border-teal-800/60 px-2 py-0.5 text-[9px] rounded-md font-mono font-bold uppercase shrink-0">
@@ -841,18 +842,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 </div>
 
                 <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                  Tu asistente conversacional está conectado al canal de chat y webhook oficial. Monitorea actividades del simulador de WhatsApp, califica leads y aplica directivas institucionales.
+                  {AGUADI_ZAP_DISPLAY_NAME}. La actividad real aparecerá cuando existan conversaciones, leads y eventos registrados en Firestore.
                 </p>
 
                 {/* Automation Mini-Stats */}
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="p-3 bg-slate-900/60 border border-slate-850/60 rounded-xl">
                     <span className="text-[9px] text-slate-550 block font-mono uppercase">Eficacia IA</span>
-                    <span className="text-sm font-black text-white font-mono block">98.4%</span>
+                    <span className="text-sm font-black text-white font-mono block">0%</span>
                   </div>
                   <div className="p-3 bg-slate-900/60 border border-slate-850/60 rounded-xl">
                     <span className="text-[9px] text-slate-550 block font-mono uppercase">Status Widget</span>
-                    <span className="text-sm font-black text-emerald-400 font-mono block">Conectado</span>
+                    <span className="text-sm font-black text-amber-400 font-mono block">Pendiente</span>
                   </div>
                 </div>
 
@@ -862,18 +863,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                   <div className="space-y-2 text-[11px] font-sans">
                     <div className="flex items-center space-x-2 text-slate-300">
                       <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                      <span className="text-slate-400 shrink-0 font-mono">08:31</span>
-                      <p className="truncate">Lead <strong className="text-teal-400">Martín</strong> calificado exitosamente (Score 85/100).</p>
-                    </div>
-                    <div className="flex items-center space-x-2 text-slate-300">
-                      <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                      <span className="text-slate-400 shrink-0 font-mono">08:15</span>
-                      <p className="truncate">WhatsApp Hook verificado de forma síncrona en servidor.</p>
-                    </div>
-                    <div className="flex items-center space-x-2 text-slate-300">
-                      <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                      <span className="text-slate-400 shrink-0 font-mono">07:58</span>
-                      <p className="truncate">Conversación iniciada desde el Widget Web Chat del cliente.</p>
+                      <span className="text-slate-400 shrink-0 font-mono">--:--</span>
+                      <p className="truncate">Sin eventos reales registrados todavía.</p>
                     </div>
                   </div>
                 </div>
@@ -885,7 +876,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                     onClick={() => onNavigate('aguadi')}
                     className="w-full py-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-teal-400 text-xs font-bold rounded-xl flex items-center justify-center space-x-2 transition cursor-pointer"
                   >
-                    <span>Configurar Cabina & Simulador Chats</span>
+                    <span>Configurar {AGUADI_ZAP_MODULE_NAME}</span>
                     <ArrowRight className="w-4 h-4 text-teal-400" />
                   </button>
                 )}
