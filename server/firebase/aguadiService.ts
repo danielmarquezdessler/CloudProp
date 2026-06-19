@@ -1,5 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { getFirestoreAdmin } from "./admin";
+import {
+  AGUADI_ZAP_COLLECTIONS,
+  AGUADI_ZAP_DEFAULT_ORG_ID,
+  AGUADI_ZAP_DISPLAY_NAME,
+  AGUADI_ZAP_MODULE_NAME,
+  LEGACY_AGUADI_COLLECTIONS
+} from "../../shared/aguadiZap";
+
+// TODO AGUADI ZAP: conectar Gemini backend real con credenciales gestionadas.
+// TODO AGUADI ZAP: publicar widget script público /widget/aguadi-zap.js.
+// TODO AGUADI ZAP: agregar scraping/indexación diaria del sitio.
+// TODO AGUADI ZAP: completar webhook WhatsApp Cloud API productivo.
+
+// Legacy alias: do not migrate/delete old collections in this PR.
+const AGUADI_COLLECTIONS = LEGACY_AGUADI_COLLECTIONS;
+void AGUADI_ZAP_COLLECTIONS;
 
 // Initialize Google GenAI client
 const ai = new GoogleGenAI({
@@ -12,7 +28,7 @@ const ai = new GoogleGenAI({
 });
 
 /**
- * Interface definition for structured AGUADI response from Gemini
+ * Interface definition for structured AGUADI ZAP response from Gemini
  */
 export interface AguadiGeminiOutput {
   reply: string;
@@ -33,11 +49,11 @@ export interface AguadiGeminiOutput {
 }
 
 /**
- * Helper to fetch or create AGUADI base settings for an organization
+ * Helper to fetch or create AGUADI ZAP base settings for an organization
  */
 export async function getOrCreateAguadiSettings(orgId: string): Promise<any> {
   const db = getFirestoreAdmin();
-  const settingsRef = db.collection('aguadi_settings').doc(orgId);
+  const settingsRef = db.collection(AGUADI_COLLECTIONS.settings).doc(orgId);
   const snapshot = await settingsRef.get();
 
   if (snapshot.exists) {
@@ -47,7 +63,7 @@ export async function getOrCreateAguadiSettings(orgId: string): Promise<any> {
   // Create default settings if not exists
   const defaultSettings = {
     orgId,
-    assistantName: "AGUADI",
+    assistantName: AGUADI_ZAP_MODULE_NAME,
     businessName: "Facundo Aguad Bienes Raíces",
     status: 'active',
     whatsappEnabled: false,
@@ -71,7 +87,7 @@ export async function getOrCreateAguadiSettings(orgId: string): Promise<any> {
  */
 export async function getOrCreateWidgetConfig(orgId: string): Promise<any> {
   const db = getFirestoreAdmin();
-  const configRef = db.collection('aguadi_widget_configs').doc(orgId);
+  const configRef = db.collection(AGUADI_COLLECTIONS.widgetConfigs).doc(orgId);
   const snapshot = await configRef.get();
 
   if (snapshot.exists) {
@@ -81,7 +97,7 @@ export async function getOrCreateWidgetConfig(orgId: string): Promise<any> {
   // Create default widget configuration
   const defaultConfig = {
     orgId,
-    visibleName: "Asistente AGUADI 24/7",
+    visibleName: AGUADI_ZAP_DISPLAY_NAME,
     initialMessage: "¡Hola! Estoy aquí para ayudarte a comprar, vender o alquilar propiedades de forma óptima. ¿Cuál es tu consulta hoy?",
     buttonText: "Escribinos por WhatsApp/Chat",
     primaryColor: "#0f172a", // slate-900
@@ -105,12 +121,12 @@ export async function getOrCreateWidgetConfig(orgId: string): Promise<any> {
 }
 
 /**
- * Log AGUADI Automation Event
+ * Log AGUADI ZAP Automation Event
  */
 export async function logAguadiEvent(orgId: string, eventType: string, details: string): Promise<void> {
   try {
     const db = getFirestoreAdmin();
-    const eventRef = db.collection('aguadi_events').doc();
+    const eventRef = db.collection(AGUADI_COLLECTIONS.events).doc();
     await eventRef.set({
       eventId: eventRef.id,
       orgId,
@@ -131,7 +147,7 @@ export async function incrementDailyMetric(orgId: string, type: 'received' | 'se
     const db = getFirestoreAdmin();
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const metricId = `${orgId}_${today}`;
-    const metricRef = db.collection('aguadi_metrics_daily').doc(metricId);
+    const metricRef = db.collection(AGUADI_COLLECTIONS.metricsDaily).doc(metricId);
 
     await db.runTransaction(async (transaction: any) => {
       const doc = await transaction.get(metricRef);
@@ -165,7 +181,7 @@ export async function incrementDailyMetric(orgId: string, type: 'received' | 'se
 export async function routeLeadToAgent(orgId: string, leadData: any, defaultAgentId: string): Promise<string> {
   try {
     const db = getFirestoreAdmin();
-    const rulesSnapshot = await db.collection('aguadi_agent_routing_rules')
+    const rulesSnapshot = await db.collection(AGUADI_COLLECTIONS.routingRules)
       .where('orgId', '==', orgId)
       .where('isActive', '==', true)
       .get();
@@ -215,7 +231,7 @@ export async function generateAguadiReply(
 ): Promise<AguadiGeminiOutput> {
   
   // Format conversation history
-  const historyText = history.map(h => `${h.sender === 'client' ? 'Cliente' : h.sender === 'bot' ? 'AGUADI' : 'Agente Humano'}: ${h.text}`).join('\n');
+  const historyText = history.map(h => `${h.sender === 'client' ? 'Cliente' : h.sender === 'bot' ? AGUADI_ZAP_MODULE_NAME : 'Agente Humano'}: ${h.text}`).join('\n');
 
   // Format custom training guidelines
   const trainingText = trainingRules && trainingRules.length > 0 
@@ -229,7 +245,7 @@ export async function generateAguadiReply(
 
   // System instruction with real estate strict boundaries
   const systemInstruction = `
-Eres AGUADI, el agente inteligente bilingüe interactivo y robot oficial de Facundo Aguad Bienes Raíces (sitio de desarrollo: cloudprop.aguadbienesraices.com.ar). Tu objetivo es guiar, responder consultas, amablemente capturar información relevante de los leads (clientes interesados en comprar, vender o alquilar) y derivar un resumen calificado a un agente de ventas humano calificado.
+Eres ${AGUADI_ZAP_MODULE_NAME}, el agente inteligente interactivo y robot oficial de Facundo Aguad Bienes Raíces (sitio: cloudprop.aguadbienesraices.com.ar). Tu objetivo es guiar, responder consultas, amablemente capturar información relevante de los leads (clientes interesados en comprar, vender o alquilar) y derivar un resumen calificado a un agente de ventas humano calificado.
 
 REGLAS DE COMPORTAMIENTO MANDATORIAS (CERO COMPROMISOS):
 1. NO inventarás propiedades o listados ficticios. Siempre basate estrictamente en lo que el usuario declara o de forma genérica respecto al mercado inmobiliario de San Miguel de Tucumán y Yerba Buena.
@@ -326,7 +342,7 @@ export async function processIncomingMessage(
   fromPhone: string,
   text: string,
   channel: 'whatsapp' | 'widget',
-  orgId: string = "aguad-corp"
+  orgId: string = AGUADI_ZAP_DEFAULT_ORG_ID
 ): Promise<{ reply: string; conversationId: string; classification: any; leadCreatedOrUpdated: boolean }> {
   
   const db = getFirestoreAdmin();
@@ -341,8 +357,8 @@ export async function processIncomingMessage(
   // 2. Fetch or create settings, training rules, and templates in parallel
   const [settings, trainingRulesSnap, templatesSnap] = await Promise.all([
     getOrCreateAguadiSettings(orgId),
-    db.collection('aguadi_training_rules').where('orgId', '==', orgId).where('isActive', '==', true).get(),
-    db.collection('aguadi_response_templates').where('orgId', '==', orgId).get()
+    db.collection(AGUADI_COLLECTIONS.trainingRules).where('orgId', '==', orgId).where('isActive', '==', true).get(),
+    db.collection(AGUADI_COLLECTIONS.responseTemplates).where('orgId', '==', orgId).get()
   ]);
 
   const trainingRules: any[] = [];
@@ -352,7 +368,7 @@ export async function processIncomingMessage(
   templatesSnap.forEach((doc: any) => templates.push(doc.data()));
 
   // 3. Save incoming client message
-  const msgClientRef = db.collection('aguadi_messages').doc();
+  const msgClientRef = db.collection(AGUADI_COLLECTIONS.messages).doc();
   await msgClientRef.set({
     messageId: msgClientRef.id,
     conversationId,
@@ -364,7 +380,7 @@ export async function processIncomingMessage(
   });
 
   // 4. Fetch conversation history (last 10 messages)
-  const historySnap = await db.collection('aguadi_messages')
+  const historySnap = await db.collection(AGUADI_COLLECTIONS.messages)
     .where('conversationId', '==', conversationId)
     .orderBy('timestamp', 'asc')
     .limit(10)
@@ -376,13 +392,13 @@ export async function processIncomingMessage(
     history.push({ sender: data.sender, text: data.text });
   });
 
-  // Ensure settings allow AGUADI to respond
+  // Ensure settings allow AGUADI ZAP to respond
   if (settings.status !== 'active') {
     const defaultAgentRoute = settings.defaultAgentId || "agent-default";
-    const outOfServiceReply = "Estimado cliente, nuestro asistente inteligente AGUADI está inactivo temporalmente por mantenimiento. Por favor, aguarde unos momentos, su consulta ya está registrada y será atendida personalmente por uno de nuestros asesores inmobiliarios.";
+    const outOfServiceReply = "Estimado cliente, nuestro asistente inteligente AGUADI ZAP está inactivo temporalmente por mantenimiento. Por favor, aguarde unos momentos, su consulta ya está registrada y será atendida personalmente por uno de nuestros asesores inmobiliarios.";
     
     // Save bot message
-    const msgBotRef = db.collection('aguadi_messages').doc();
+    const msgBotRef = db.collection(AGUADI_COLLECTIONS.messages).doc();
     await msgBotRef.set({
       messageId: msgBotRef.id,
       conversationId,
@@ -405,7 +421,7 @@ export async function processIncomingMessage(
   const aiOutput = await generateAguadiReply(text, history, settings, trainingRules, templates);
 
   // 6. Save bot response message
-  const msgBotRef = db.collection('aguadi_messages').doc();
+  const msgBotRef = db.collection(AGUADI_COLLECTIONS.messages).doc();
   await msgBotRef.set({
     messageId: msgBotRef.id,
     conversationId,
@@ -424,7 +440,7 @@ export async function processIncomingMessage(
   await logAguadiEvent(orgId, 'message_sent', `Respuesta enviada a ${fromPhone}: "${aiOutput.reply.substring(0, 60)}"`);
 
   // 7. Manage or Create Conversation
-  const convRef = db.collection('aguadi_conversations').doc(conversationId);
+  const convRef = db.collection(AGUADI_COLLECTIONS.conversations).doc(conversationId);
   const convSnapshot = await convRef.get();
 
   const conversationStatus = aiOutput.classification.isLeadComplete ? 'active' : 'open';
@@ -459,7 +475,7 @@ export async function processIncomingMessage(
   // Create / Update lead document if any parameter is captured
   if (aiOutput.classification.fullName || aiOutput.classification.propertyType || aiOutput.classification.operationType) {
     const leadId = `lead_${conversationId}`;
-    const leadRef = db.collection('aguadi_leads').doc(leadId);
+    const leadRef = db.collection(AGUADI_COLLECTIONS.leads).doc(leadId);
     const leadSnapshot = await leadRef.get();
 
     const assignedAgentId = await routeLeadToAgent(orgId, aiOutput.classification, settings.defaultAgentId || "agent-default");
@@ -487,7 +503,7 @@ export async function processIncomingMessage(
 
     if (!leadSnapshot.exists) {
       payload.createdAt = new Date().toISOString();
-      payload.createdBy = "AGUADI_BOT";
+      payload.createdBy = "AGUADI_ZAP_BOT";
       await leadRef.set(payload);
       leadCreatedOrUpdated = true;
       await incrementDailyMetric(orgId, 'lead');

@@ -40,6 +40,7 @@ import {
   AguadiResponseTemplate, 
   AguadiEvent 
 } from '../types';
+import { AGUADI_ZAP_DISPLAY_NAME, AGUADI_ZAP_MODULE_NAME } from '../../shared/aguadiZap';
 
 export const AguadiCabinetView: React.FC = () => {
   const { user } = useAuth();
@@ -47,7 +48,7 @@ export const AguadiCabinetView: React.FC = () => {
   // Dashboard Tabs
   const [activeTab, setActiveTab] = useState<'simulator' | 'leads' | 'rules' | 'widget' | 'telemetry'>('simulator');
 
-  // AGUADI Configuration States
+  // AGUADI ZAP Configuration States
   const [settings, setSettings] = useState<AguadiSettings | null>(null);
   const [widgetConfig, setWidgetConfig] = useState<AguadiWidgetConfig | null>(null);
   
@@ -93,7 +94,7 @@ export const AguadiCabinetView: React.FC = () => {
   const [widgetInputText, setWidgetInputText] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch full AGUADI configuration
+  // Fetch full AGUADI ZAP configuration
   const fetchAguadiData = async () => {
     try {
       setLoading(true);
@@ -142,8 +143,8 @@ export const AguadiCabinetView: React.FC = () => {
       }
 
     } catch (err: any) {
-      console.error("[AGUADI Cabin] Load Error:", err);
-      setErrorMsg(err.message || 'Error cargando datos de configuración de AGUADI.');
+      console.error("[AGUADI ZAP Cabin] Load Error:", err);
+      setErrorMsg(err.message || 'Error cargando datos de configuración de AGUADI ZAP.');
     } finally {
       setLoading(false);
     }
@@ -159,7 +160,7 @@ export const AguadiCabinetView: React.FC = () => {
         setMessages(data.messages || []);
       }
     } catch (error) {
-      console.error("[AGUADI Cabin] Error fetching messages:", error);
+      console.error("[AGUADI ZAP Cabin] Error fetching messages:", error);
     }
   };
 
@@ -199,7 +200,7 @@ export const AguadiCabinetView: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("¡Parámetros de AGUADI guardados de forma exitosa!");
+        alert("¡Parámetros de AGUADI ZAP guardados de forma exitosa!");
         fetchAguadiData();
       } else {
         alert("Error guardando settings: " + data.error);
@@ -471,7 +472,7 @@ export const AguadiCabinetView: React.FC = () => {
     return (
       <div className="bg-white rounded-3xl border border-slate-100 p-12 text-center flex flex-col justify-center items-center dark:bg-slate-900 dark:border-slate-800">
         <RefreshCw className="animate-spin w-8 h-8 text-teal-500 mb-3" />
-        <p className="text-sm font-semibold text-slate-500 font-mono">CONECTANDO A LA CENTRAL AGUADI INMOBILIARIA...</p>
+        <p className="text-sm font-semibold text-slate-500 font-mono">CONECTANDO A LA CENTRAL AGUADI ZAP INMOBILIARIA...</p>
       </div>
     );
   }
@@ -488,7 +489,7 @@ export const AguadiCabinetView: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-lg font-black text-slate-950 tracking-tight dark:text-white uppercase leading-none">
-                {settings?.assistantName || "AGUADI"} — Conversión WhatsApp 24/7
+                {AGUADI_ZAP_DISPLAY_NAME}
               </h1>
               <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase font-mono border ${
                 settings?.status === 'active' 
@@ -629,7 +630,7 @@ export const AguadiCabinetView: React.FC = () => {
                 </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-none uppercase">
-                AGUADI — Centro de conversión WhatsApp 24/7
+                AGUADI ZAP — Centro de conversión WhatsApp 24/7
               </h2>
               <p className="text-slate-300 text-xs md:text-sm leading-relaxed font-light">
                 Configurá, probá y optimizá el asistente inteligente que convierte visitantes web en oportunidades comerciales por WhatsApp. Se alimenta de forma segura con modelos avanzados de Google Gemini y flujos de WhatsApp Business Platform.
@@ -642,7 +643,7 @@ export const AguadiCabinetView: React.FC = () => {
                 className="px-4.5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-lg shadow-teal-500/20"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Probar AGUADI</span>
+                <span>Probar AGUADI ZAP</span>
               </button>
               <button
                 onClick={() => setActiveTab('widget')}
@@ -664,10 +665,10 @@ export const AguadiCabinetView: React.FC = () => {
           {/* System status cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* 1. AGUADI Status */}
+            {/* 1. AGUADI ZAP Status */}
             <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 relative overflow-hidden flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Estado AGUADI</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Estado AGUADI ZAP</span>
                 <span className="text-xs text-slate-400 mt-1 block">Robot Calificador Central</span>
               </div>
               <div className="mt-4 flex items-center space-x-2">
@@ -1039,7 +1040,7 @@ export const AguadiCabinetView: React.FC = () => {
                 {conversations.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 border border-dashed rounded-2xl border-slate-100">
                     <p className="text-xs font-semibold font-mono text-slate-400 uppercase tracking-wider">
-                      Todavía no hay conversaciones registradas. Cuando AGUADI comience a operar, aparecerán aquí.
+                      Todavía no hay conversaciones registradas. Cuando AGUADI ZAP comience a operar, aparecerán aquí.
                     </p>
                   </div>
                 ) : (
@@ -1129,7 +1130,7 @@ export const AguadiCabinetView: React.FC = () => {
                   {!settings?.whatsappEnabled && (
                     <div className="p-3 bg-amber-500/5 border border-amber-500/15 rounded-2xl relative">
                       <p className="font-bold text-slate-800 dark:text-amber-300 text-[11px]">Configurar WhatsApp Cloud API</p>
-                      <p className="text-slate-500 text-[10px] mt-1">Conecta el webhook oficial para que AGUADI interactúe directamente desde tu línea verificada de WhatsApp Business.</p>
+                      <p className="text-slate-500 text-[10px] mt-1">Conecta el webhook oficial para que AGUADI ZAP interactúe directamente desde tu línea verificada de WhatsApp Business.</p>
                     </div>
                   )}
 
@@ -1154,7 +1155,7 @@ export const AguadiCabinetView: React.FC = () => {
               <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-3.5">
                 <div className="flex items-center space-x-2">
                   <Palette className="w-4 h-4 text-teal-500 animate-pulse" />
-                  <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Widget web AGUADI</strong>
+                  <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Widget web AGUADI ZAP</strong>
                 </div>
 
                 <div className="text-xs space-y-2.5">
@@ -1169,7 +1170,7 @@ export const AguadiCabinetView: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-slate-400 block uppercase font-mono">Nombre</span>
-                      <strong className="text-slate-800 dark:text-slate-100 truncate block">{widgetConfig?.visibleName || 'Asistente AGUADI'}</strong>
+                      <strong className="text-slate-800 dark:text-slate-100 truncate block">{widgetConfig?.visibleName || AGUADI_ZAP_MODULE_NAME}</strong>
                     </div>
                     <div>
                       <span className="text-slate-400 block uppercase font-mono">Posición</span>
@@ -1180,8 +1181,8 @@ export const AguadiCabinetView: React.FC = () => {
                   <div className="pt-2">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block font-mono mb-1">Código de instalación previsto:</span>
                     <div className="bg-slate-950 text-emerald-400 p-3 rounded-2xl text-[9.5px] font-mono leading-relaxed border border-slate-900 select-all overflow-x-auto">
-                      {`<!-- AGUADI 24/7 web conversion script -->
-<script src="https://cloudprop.aguadbienesraices.com.ar/widget/aguadi.js"></script>`}
+                      {`<!-- AGUADI ZAP 24/7 web conversion script -->
+<script src="https://cloudprop.aguadbienesraices.com.ar/widget/aguadi-zap.js"></script>`}
                     </div>
                     <span className="text-[9px] text-slate-400 block mt-1.5 italic">
                       Insertar este script después de la etiqueta <code>&lt;header&gt;</code> del sitio web.
@@ -1192,7 +1193,7 @@ export const AguadiCabinetView: React.FC = () => {
 
               {/* Simulator Preview block */}
               <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-3.5">
-                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Simulador AGUADI</strong>
+                <strong className="text-[10px] font-black font-mono tracking-wider text-slate-400 uppercase block">Simulador AGUADI ZAP</strong>
                 <p className="text-slate-400 text-[10px] font-medium leading-relaxed">
                   Prueba el comportamiento sintético del bot para ver cómo califica y rutea leads en vivo según distintos escenarios:
                 </p>
@@ -1403,7 +1404,7 @@ export const AguadiCabinetView: React.FC = () => {
                           : 'bg-teal-500/5 border-teal-200 text-teal-900 rounded-tr-none dark:text-teal-100'
                       }`}>
                         <div className="flex items-center space-x-1.5 mb-1 text-[9px] font-bold tracking-widest text-slate-400 font-mono uppercase">
-                          <span>{isBot ? 'INTELESENSE_BOT / AGUADI' : 'CLIENTE / INTERESADO'}</span>
+                          <span>{isBot ? 'AGUADI_ZAP_BOT' : 'CLIENTE / INTERESADO'}</span>
                           {isBot && msg.metadata?.leadScore !== undefined && (
                             <span className="text-emerald-500 bg-emerald-50 dark:bg-emerald-950 px-1 rounded-sm">Score: {msg.metadata.leadScore}%</span>
                           )}
@@ -1578,7 +1579,7 @@ export const AguadiCabinetView: React.FC = () => {
       {activeTab === 'leads' && (
         <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 font-sans" id="leads-list-stage">
           <div className="flex justify-between items-center mb-4.5">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Leads Calificados por AGUADI en Firestore</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Leads calificados por AGUADI ZAP en Firestore</h2>
             <span className="text-xs text-slate-400 font-mono">Registros totales en el cuadrante: <strong>{leads.length}</strong></span>
           </div>
 
@@ -1827,7 +1828,7 @@ export const AguadiCabinetView: React.FC = () => {
               {/* Training Rules list */}
               <div className="space-y-2">
                 {trainingRules.length === 0 ? (
-                  <p className="p-4 text-center text-xs border border-dashed border-slate-100 rounded-xl text-slate-400">Sin directrices específicas. AGUADI responde libremente bajo ética profesional.</p>
+                  <p className="p-4 text-center text-xs border border-dashed border-slate-100 rounded-xl text-slate-400">Sin directrices específicas. AGUADI ZAP responde libremente bajo ética profesional.</p>
                 ) : (
                   trainingRules.map((r) => (
                     <div key={r.ruleId} className="flex justify-between items-start p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
@@ -1943,7 +1944,7 @@ export const AguadiCabinetView: React.FC = () => {
           {/* Settings Left Column (6 cols) */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* General AGUADI parameters form */}
+            {/* General AGUADI ZAP parameters form */}
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800">
               <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase mb-4 block">Parámetros Operacionales del Robot</h2>
               
@@ -2198,7 +2199,7 @@ export const AguadiCabinetView: React.FC = () => {
                           <input 
                             type="text" 
                             disabled 
-                            placeholder="Chatea con AGUADI..." 
+                            placeholder="Chatea con AGUADI ZAP..."
                             className="w-full bg-white border border-slate-200 rounded-lg px-2 text-[9px] focus:outline-none" 
                           />
                           <button 
@@ -2250,7 +2251,7 @@ export const AguadiCabinetView: React.FC = () => {
           
           {/* Timeline events panel (8 cols) */}
           <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Bitácora Técnica de Eventos AGUADI</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Bitácora Técnica de Eventos AGUADI ZAP</h2>
             <p className="text-slate-400 text-xs font-medium leading-normal">
               Flujo real registrado de triggers de webhook, resoluciones de clasificación lingüística del bot, derivaciones completas y fallos de API.
             </p>

@@ -6,10 +6,18 @@ import {
   getOrCreateWidgetConfig, 
   logAguadiEvent 
 } from "./aguadiService";
+import {
+  AGUADI_ZAP_COLLECTIONS,
+  AGUADI_ZAP_DEFAULT_ORG_ID,
+  AGUADI_ZAP_PERMISSIONS,
+  LEGACY_AGUADI_COLLECTIONS
+} from "../../shared/aguadiZap";
 
 const router = Router();
+const AGUADI_COLLECTIONS = LEGACY_AGUADI_COLLECTIONS;
+void AGUADI_ZAP_COLLECTIONS;
 
-// Middleware to authorize authenticated agents or super_admins
+// Middleware to authorize AGUADI ZAP access.
 const requireAguadiStaff = async (req: any, res: any, next: any) => {
   const callerUid = req.headers['x-user-uid'] || (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].split(' ')[1] : null);
   if (!callerUid) {
@@ -23,8 +31,15 @@ const requireAguadiStaff = async (req: any, res: any, next: any) => {
       return res.status(404).json({ success: false, error: "Perfil de usuario no encontrado en el sistema." });
     }
     const profile = userDoc.data();
-    if (profile?.role !== 'super_admin' && profile?.role !== 'agent') {
-      return res.status(403).json({ success: false, error: "Permiso denegado: Se requiere rol de Agente o Super Administrador." });
+    const permissions = Array.isArray(profile?.permissions) ? profile.permissions : [];
+    const canViewAguadiZap =
+      profile?.role === 'super_admin' ||
+      permissions.includes('*') ||
+      permissions.includes(AGUADI_ZAP_PERMISSIONS.legacyView) ||
+      permissions.includes(AGUADI_ZAP_PERMISSIONS.view);
+
+    if (!canViewAguadiZap) {
+      return res.status(403).json({ success: false, error: "Permiso denegado: Se requiere acceso a AGUADI ZAP." });
     }
 
     req.callerUid = callerUid;
@@ -35,11 +50,21 @@ const requireAguadiStaff = async (req: any, res: any, next: any) => {
   }
 };
 
+const getCallerOrgId = (req: any) => {
+  const orgId = req.callerProfile?.orgId;
+  if (!orgId) {
+    const error: any = new Error("Falta orgId en el perfil autenticado. AGUADI ZAP no usará fallback de organización.");
+    error.statusCode = 400;
+    throw error;
+  }
+  return orgId;
+};
+
 /**
  * 1. public widget configuration endpoint
  */
 router.get("/public/widget-config", async (req, res) => {
-  const orgId = (req.query.orgId as string) || "aguad-corp";
+  const orgId = (req.query.orgId as string) || AGUADI_ZAP_DEFAULT_ORG_ID;
   try {
     const config = await getOrCreateWidgetConfig(orgId);
     res.json({ success: true, config });
@@ -84,8 +109,8 @@ router.post("/aguadi/webhook", async (req, res) => {
       const text = message.text?.body || "";
 
       if (text) {
-        // Run AGUADI Engine asynchronously to respond instantly to WhatsApp
-        processIncomingMessage(fromPhone, text, 'whatsapp', 'aguad-corp')
+        // Run AGUADI ZAP Engine asynchronously to respond instantly to WhatsApp.
+        processIncomingMessage(fromPhone, text, 'whatsapp', AGUADI_ZAP_DEFAULT_ORG_ID)
           .then((result) => {
             console.log(`[AGUADI Webhook] Correctly processed WhatsApp reply: "${result.reply.substring(0, 30)}..."`);
           })
@@ -115,7 +140,7 @@ router.post("/aguadi/simulate-incoming", async (req, res) => {
   }
 
   const targetChannel = channel === 'widget' ? 'widget' : 'whatsapp';
-  const targetOrg = orgId || "aguad-corp";
+  const targetOrg = orgId || AGUADI_ZAP_DEFAULT_ORG_ID;
 
   try {
     const result = await processIncomingMessage(phone, text, targetChannel, targetOrg);
@@ -136,16 +161,16 @@ router.post("/aguadi/simulate-incoming", async (req, res) => {
  * 5. GET Current AGUADI configuration, training, routing and templates (Multi-entity get)
  */
 router.get("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const db = getFirestoreAdmin();
 
   try {
+    const orgId = getCallerOrgId(req);
     const [settings, widget, rulesSnap, trainingSnap, templatesSnap] = await Promise.all([
       getOrCreateAguadiSettings(orgId),
       getOrCreateWidgetConfig(orgId),
-      db.collection('aguadi_agent_routing_rules').where('orgId', '==', orgId).get(),
-      db.collection('aguadi_training_rules').where('orgId', '==', orgId).get(),
-      db.collection('aguadi_response_templates').where('orgId', '==', orgId).get()
+      db.collection(AGUADI_COLLECTIONS.routingRules).where('orgId', '==', orgId).get(),
+      db.collection(AGUADI_COLLECTIONS.trainingRules).where('orgId', '==', orgId).get(),
+      db.collection(AGUADI_COLLECTIONS.responseTemplates).where('orgId', '==', orgId).get()
     ]);
 
     const routingRules: any[] = [];
@@ -174,12 +199,12 @@ router.get("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
  * 6. SAVE AGUADI settings
  */
 router.post("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const updates = req.body;
   const db = getFirestoreAdmin();
 
   try {
-    const ref = db.collection('aguadi_settings').doc(orgId);
+    const orgId = getCallerOrgId(req);
+    const ref = db.collection(AGUADI_COLLECTIONS.settings).doc(orgId);
     const updatedPayload = {
       ...updates,
       orgId,
@@ -200,12 +225,12 @@ router.post("/aguadi/settings", requireAguadiStaff, async (req: any, res) => {
  * 7. SAVE widget styling config
  */
 router.post("/aguadi/widget-config", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const updates = req.body;
   const db = getFirestoreAdmin();
 
   try {
-    const ref = db.collection('aguadi_widget_configs').doc(orgId);
+    const orgId = getCallerOrgId(req);
+    const ref = db.collection(AGUADI_COLLECTIONS.widgetConfigs).doc(orgId);
     const updatedPayload = {
       ...updates,
       orgId,
@@ -225,11 +250,11 @@ router.post("/aguadi/widget-config", requireAguadiStaff, async (req: any, res) =
  * 8. GET Conversations list (filtered by multitenant org)
  */
 router.get("/aguadi/conversations", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const db = getFirestoreAdmin();
 
   try {
-    const snap = await db.collection('aguadi_conversations')
+    const orgId = getCallerOrgId(req);
+    const snap = await db.collection(AGUADI_COLLECTIONS.conversations)
       .where('orgId', '==', orgId)
       .orderBy('lastMessageAt', 'desc')
       .get();
@@ -251,7 +276,7 @@ router.get("/aguadi/conversations/:id/messages", requireAguadiStaff, async (req:
   const db = getFirestoreAdmin();
 
   try {
-    const snap = await db.collection('aguadi_messages')
+    const snap = await db.collection(AGUADI_COLLECTIONS.messages)
       .where('conversationId', '==', convId)
       .orderBy('timestamp', 'asc')
       .limit(100)
@@ -270,11 +295,11 @@ router.get("/aguadi/conversations/:id/messages", requireAguadiStaff, async (req:
  * 10. GET Captured Leads
  */
 router.get("/aguadi/leads", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const db = getFirestoreAdmin();
 
   try {
-    const snap = await db.collection('aguadi_leads')
+    const orgId = getCallerOrgId(req);
+    const snap = await db.collection(AGUADI_COLLECTIONS.leads)
       .where('orgId', '==', orgId)
       .orderBy('createdAt', 'desc')
       .get();
@@ -292,15 +317,15 @@ router.get("/aguadi/leads", requireAguadiStaff, async (req: any, res) => {
  * 11. GET Dashboard Diagnostics: aggregate numbers, active history, daily counts
  */
 router.get("/aguadi/metrics", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const db = getFirestoreAdmin();
 
   try {
+    const orgId = getCallerOrgId(req);
     const [eventsSnap, metricsSnap, leadsSnap, convsSnap] = await Promise.all([
-      db.collection('aguadi_events').where('orgId', '==', orgId).orderBy('timestamp', 'desc').limit(50).get(),
-      db.collection('aguadi_metrics_daily').where('orgId', '==', orgId).orderBy('date', 'desc').limit(15).get(),
-      db.collection('aguadi_leads').where('orgId', '==', orgId).get(),
-      db.collection('aguadi_conversations').where('orgId', '==', orgId).get()
+      db.collection(AGUADI_COLLECTIONS.events).where('orgId', '==', orgId).orderBy('timestamp', 'desc').limit(50).get(),
+      db.collection(AGUADI_COLLECTIONS.metricsDaily).where('orgId', '==', orgId).orderBy('date', 'desc').limit(15).get(),
+      db.collection(AGUADI_COLLECTIONS.leads).where('orgId', '==', orgId).get(),
+      db.collection(AGUADI_COLLECTIONS.conversations).where('orgId', '==', orgId).get()
     ]);
 
     const events: any[] = [];
@@ -340,13 +365,13 @@ router.get("/aguadi/metrics", requireAguadiStaff, async (req: any, res) => {
  * 12. CRUD Endpoints: AGENT ROUTING RULES
  */
 router.post("/aguadi/routing-rules/save", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const { id, criteriaType, criteriaValue, assignedAgentId, isActive, priority, name } = req.body;
   const db = getFirestoreAdmin();
 
   try {
-    const ruleId = id || db.collection('aguadi_agent_routing_rules').doc().id;
-    const ref = db.collection('aguadi_agent_routing_rules').doc(ruleId);
+    const orgId = getCallerOrgId(req);
+    const ruleId = id || db.collection(AGUADI_COLLECTIONS.routingRules).doc().id;
+    const ref = db.collection(AGUADI_COLLECTIONS.routingRules).doc(ruleId);
     
     const rulePayload = {
       ruleId,
@@ -375,7 +400,7 @@ router.post("/aguadi/routing-rules/delete", requireAguadiStaff, async (req: any,
 
   try {
     if (!id) return res.status(400).json({ success: false, error: "ID de regla faltante." });
-    await db.collection('aguadi_agent_routing_rules').doc(id).delete();
+    await db.collection(AGUADI_COLLECTIONS.routingRules).doc(id).delete();
     res.json({ success: true, message: "Regla eliminada exitosamente." });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -386,13 +411,13 @@ router.post("/aguadi/routing-rules/delete", requireAguadiStaff, async (req: any,
  * 13. CRUD Endpoints: TRAINING GUIDELINES (AI instruction injections)
  */
 router.post("/aguadi/training-rules/save", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const { id, keywordOrTopic, customGuideline, isActive } = req.body;
   const db = getFirestoreAdmin();
 
   try {
-    const ruleId = id || db.collection('aguadi_training_rules').doc().id;
-    const ref = db.collection('aguadi_training_rules').doc(ruleId);
+    const orgId = getCallerOrgId(req);
+    const ruleId = id || db.collection(AGUADI_COLLECTIONS.trainingRules).doc().id;
+    const ref = db.collection(AGUADI_COLLECTIONS.trainingRules).doc(ruleId);
     
     const trainingPayload = {
       ruleId,
@@ -416,7 +441,7 @@ router.post("/aguadi/training-rules/delete", requireAguadiStaff, async (req: any
 
   try {
     if (!id) return res.status(400).json({ success: false, error: "ID de directriz requerido." });
-    await db.collection('aguadi_training_rules').doc(id).delete();
+    await db.collection(AGUADI_COLLECTIONS.trainingRules).doc(id).delete();
     res.json({ success: true, message: "Directriz eliminada de forma exitosa." });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -427,13 +452,13 @@ router.post("/aguadi/training-rules/delete", requireAguadiStaff, async (req: any
  * 14. CRUD Endpoints: CUSTOM RESPONSE TEMPLATES
  */
 router.post("/aguadi/response-templates/save", requireAguadiStaff, async (req: any, res) => {
-  const orgId = req.callerProfile.orgId || "aguad-corp";
   const { id, title, category, text } = req.body;
   const db = getFirestoreAdmin();
 
   try {
-    const templateId = id || db.collection('aguadi_response_templates').doc().id;
-    const ref = db.collection('aguadi_response_templates').doc(templateId);
+    const orgId = getCallerOrgId(req);
+    const templateId = id || db.collection(AGUADI_COLLECTIONS.responseTemplates).doc().id;
+    const ref = db.collection(AGUADI_COLLECTIONS.responseTemplates).doc(templateId);
     
     const templatePayload = {
       templateId,
@@ -457,7 +482,7 @@ router.post("/aguadi/response-templates/delete", requireAguadiStaff, async (req:
 
   try {
     if (!id) return res.status(400).json({ success: false, error: "ID de plantilla faltante." });
-    await db.collection('aguadi_response_templates').doc(id).delete();
+    await db.collection(AGUADI_COLLECTIONS.responseTemplates).doc(id).delete();
     res.json({ success: true, message: "Plantilla institucional borrada con éxito." });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
