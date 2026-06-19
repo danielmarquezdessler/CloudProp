@@ -26,20 +26,20 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenSidebar }) => {
             onClick={onOpenSidebar}
             className="rounded-md p-1.5 text-[#0d2338] transition hover:bg-[#eef4f8] md:hidden"
             id="btn-sidebar-trigger-mobile"
-            aria-label="Abrir navegaciÃ³n"
+            aria-label="Abrir navegación"
           >
             <Menu className="h-5 w-5" />
           </button>
           <button
             type="button"
             className="hidden rounded-md p-1.5 text-[#0d2338] transition hover:bg-[#eef4f8] md:block"
-            aria-label="Contraer navegaciÃ³n"
+            aria-label="Contraer navegación"
           >
             <Menu className="h-4 w-4" />
           </button>
           <div className="leading-tight">
             <p className="text-sm font-black text-[#003d78]">F.A CloudProp Suite</p>
-            <p className="text-[11px] font-medium text-[#465875]">Aguad Bienes RaÃ­ces</p>
+            <p className="text-[11px] font-medium text-[#465875]">Aguad Bienes Raíces</p>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { Language, Translations, dictionary } from '../i18n';
+import { Translations, t as spanishArgentinaTranslations } from '../i18n';
 import { db, auth } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -10,9 +10,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  language: Language;
   t: Translations;
-  changeLanguage: (lang: Language) => void;
   login: (email: string, passwordString: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
@@ -27,13 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Choose default language 'es' as instructed
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('aguad_cloudprop_lang');
-    return (saved as Language) || 'es';
-  });
-
-  const t = dictionary[language];
+  const t = spanishArgentinaTranslations;
 
   // Auth synchronization with Firebase onAuthStateChanged
   useEffect(() => {
@@ -60,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const authUidOk = userData.authUid === firebaseUser.uid;
 
             if (!statusOk) {
-              setError("Tu usuario estÃ¡ suspendido. ContactÃ¡ al administrador.");
+              setError("Tu usuario está suspendido. Contactá al administrador.");
               setUser(null);
               await signOut(auth);
               localStorage.removeItem('aguad_cloudprop_uid');
@@ -68,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               localStorage.removeItem('aguad_cloudprop_name');
               localStorage.removeItem('aguad_cloudprop_role');
             } else if (!roleOk || !permissionsOk || !orgIdOk || !authUidOk) {
-              setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
+              setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
               setUser(null);
               await signOut(auth);
               localStorage.removeItem('aguad_cloudprop_uid');
@@ -85,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } else {
             // Profile does not exist yet inside Firestore - BLOCK AND LOGOUT
-            setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
+            setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
             setUser(null);
             await signOut(auth);
             localStorage.removeItem('aguad_cloudprop_uid');
@@ -95,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (err) {
           console.error("Session profile sync error with Firestore", err);
-          setError("El perfil de usuario no estÃ¡ configurado correctamente. ContactÃ¡ al administrador.");
+          setError("El perfil de usuario no está configurado correctamente. Contactá al administrador.");
           setUser(null);
           await signOut(auth);
         }
@@ -110,11 +102,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     return () => unsubscribe();
   }, []);
-
-  const changeLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('aguad_cloudprop_lang', lang);
-  };
 
   // Base persistent auth proxy fetch
   const apiFetch = async (url: string, options: RequestInit = {}) => {
@@ -137,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('aguad_cloudprop_email');
       localStorage.removeItem('aguad_cloudprop_name');
       localStorage.removeItem('aguad_cloudprop_role');
-      throw new Error("Su sesión ha expirado o no estÃ¡ autorizado.");
+      throw new Error("Su sesión ha expirado o no está autorizado.");
     }
 
     return response;
@@ -226,9 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       loading,
       error,
-      language,
       t,
-      changeLanguage,
       login,
       loginWithGoogle,
       logout,
