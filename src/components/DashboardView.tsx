@@ -49,7 +49,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- INTERACTIVE TOOL 1: MULTILINGUAL PORTAL SYNTHESIZER ---
+  // --- INTERACTIVE TOOL 1: PUBLICATION SYNTHESIZER ---
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const [syncedPropertyDetails, setSyncedPropertyDetails] = useState<string>('');
   const [generatedFicha, setGeneratedFicha] = useState<string>('');
@@ -128,7 +128,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     fetchDashboardData();
   }, [user]);
 
-  // Handle Tool 1: generate multilingual brochure
+  // Handle Tool 1: generate publication copy
   const handleGenerateFicha = async () => {
     const prop = allProperties.find(p => p.id === selectedPropertyId);
     if (!prop) {
@@ -414,7 +414,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* BENTO TOOL 1: MULTILINGUAL AI BROCHURE GENERATOR */}
+            {/* BENTO TOOL 1: AI PUBLICATION COPY GENERATOR */}
             <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
@@ -423,17 +423,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                       <Globe className="w-4.5 h-4.5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-none">Sintetizador de Folletos Tri-Idioma</h3>
-                      <span className="text-[9px] text-slate-500 font-mono tracking-wider">GEMINI MULTILINGUAL BROCHURE COMPIILER</span>
+                      <h3 className="text-sm font-bold text-white tracking-tight uppercase leading-none">Sintetizador de publicaciones</h3>
+                      <span className="text-[9px] text-slate-500 font-mono tracking-wider">REDACCIÓN INMOBILIARIA CON IA</span>
                     </div>
                   </div>
                   <span className="text-[9px] font-bold font-mono tracking-widest text-[#10b981] bg-[#10b981]/10 border border-[#10b981]/20 px-2 py-0.5 rounded-full uppercase shrink-0">
-                    LISTINGS-READY
+                    LISTO PARA PUBLICAR
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-400 mb-5 leading-relaxed">
-                  Exporta una ficha de propiedad instantánea y de alta conversión adaptada nativamente a <strong>Español 🇦🇷, Inglés 🇬🇧 y Portugués 🇧🇷</strong> usando la información de tu cartera de inmuebles.
+                  Exportá una ficha de propiedad instantánea y de alta conversión en español Argentina usando la información de tu cartera de inmuebles.
                 </p>
 
                 {allProperties.length === 0 ? (
@@ -476,7 +476,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 text-white" />
-                          <span>GENERAR PROPAGANDA MULTILENGUAJE AI</span>
+                          <span>GENERAR PUBLICACIÓN EN ESPAÑOL</span>
                         </>
                       )}
                     </button>
@@ -630,7 +630,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                         <span className="font-bold text-white text-xs font-mono">{leadAnalysis.phone}</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-slate-500 block uppercase font-mono">Operación</span>
+                        <span className="text-[9px] text-slate-500 block uppercase font-mono">operación</span>
                         <span className="font-bold text-teal-300 text-xs uppercase">{leadAnalysis.operationType}</span>
                       </div>
                       <div>
@@ -946,7 +946,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 <div className="py-12 flex flex-col items-center justify-center text-center space-y-2">
                   <ShieldAlert className="w-8 h-8 text-amber-500 opacity-60 animate-pulse" />
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-xs leading-normal">
-                    Los registros de auditoría detallados de base de datos están restringidos a cuentas de nivel <strong className="text-rose-500 font-mono">super_admin</strong> por políticas de seguridad del producto.
+                    Los registros de Auditoría detallados de base de datos están restringidos a cuentas de nivel <strong className="text-rose-500 font-mono">super_admin</strong> por políticas de seguridad del producto.
                   </p>
                 </div>
               ) : recentLogs.length === 0 ? (
@@ -989,3 +989,4 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     </div>
   );
 };
+

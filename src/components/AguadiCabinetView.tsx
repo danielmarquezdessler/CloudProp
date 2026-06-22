@@ -228,7 +228,7 @@ export const AguadiCabinetView: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("¡Configuración visual del Widget grabada correctamente!");
+        alert("¡configuración visual del Widget grabada correctamente!");
         fetchAguadiData();
       } else {
         alert("Error guardando widget: " + data.error);
@@ -809,10 +809,10 @@ export const AguadiCabinetView: React.FC = () => {
 
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   
-                  {/* Item 1. Configuración general */}
+                  {/* Item 1. configuración general */}
                   <div className="py-3 flex justify-between items-start gap-4">
                     <div className="text-xs">
-                      <strong className="text-slate-850 font-bold dark:text-slate-100">Configuración general</strong>
+                      <strong className="text-slate-850 font-bold dark:text-slate-100">configuración general</strong>
                       <p className="text-slate-400 mt-0.5 leading-relaxed">Establece el nombre comercial del deudor y los tonos del robot.</p>
                     </div>
                     <div className="flex items-center space-x-3 shrink-0">
@@ -1051,7 +1051,7 @@ export const AguadiCabinetView: React.FC = () => {
                           <th className="p-2.5">Fecha</th>
                           <th className="p-2.5">Cliente</th>
                           <th className="p-2.5">Canal</th>
-                          <th className="p-2.5">Intención / Operación</th>
+                          <th className="p-2.5">Intención / operación</th>
                           <th className="p-2.5">Estado</th>
                           <th className="p-2.5">Score</th>
                           <th className="p-2.5">Acciones</th>
@@ -1301,9 +1301,9 @@ export const AguadiCabinetView: React.FC = () => {
                   <p><strong>Criterios dinámicos de ruteo:</strong> {routingRules.length} reglas activas</p>
                   <p className="mt-1">Reglas del contrato:</p>
                   <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
-                    <li>Si la intención es <strong>compra</strong>, derivar a agente Facundo.</li>
-                    <li>Si la intención es <strong>alquiler</strong>, derivar a Marcos Vargas.</li>
-                    <li>Si la intención es de <strong>propietario vendedor</strong>, asignar a agente Senior.</li>
+                    <li>Si la Intención es <strong>compra</strong>, derivar a agente Facundo.</li>
+                    <li>Si la Intención es <strong>alquiler</strong>, derivar a Marcos Vargas.</li>
+                    <li>Si la Intención es de <strong>propietario vendedor</strong>, asignar a agente Senior.</li>
                   </ul>
                 </div>
               </div>
@@ -1524,7 +1524,7 @@ export const AguadiCabinetView: React.FC = () => {
                   <strong className="text-slate-900 dark:text-white font-bold truncate max-w-[120px]">{selectedLead?.fullName || 'Pendiente'}</strong>
                 </div>
                 <div className="flex justify-between items-center bg-slate-50/50 p-2 rounded-xl dark:bg-slate-800/10">
-                  <span className="font-mono text-[9px] text-slate-400 uppercase font-bold">Operación</span>
+                  <span className="font-mono text-[9px] text-slate-400 uppercase font-bold">operación</span>
                   <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 font-bold uppercase text-[9px] tracking-tight">
                     {selectedLead?.operationType || 'No detectada'}
                   </span>
@@ -1595,7 +1595,7 @@ export const AguadiCabinetView: React.FC = () => {
                 <thead>
                   <tr className="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-mono tracking-wider bg-slate-50/50 dark:bg-slate-850 dark:border-slate-800">
                     <th className="p-3">Nombre Lead / Teléfono</th>
-                    <th className="p-3">Operación / Inmueble</th>
+                    <th className="p-3">operación / Inmueble</th>
                     <th className="p-3">Zona preferida</th>
                     <th className="p-3">Calificación (Score)</th>
                     <th className="p-3">Presupuesto</th>
@@ -1711,7 +1711,7 @@ export const AguadiCabinetView: React.FC = () => {
                     onChange={(e: any) => setNewRuleType(e.target.value)}
                     className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800"
                   >
-                    <option value="operationType">Tipo Operación (compra, venta...)</option>
+                    <option value="operationType">Tipo operación (compra, venta...)</option>
                     <option value="propertyType">Tipo Inmueble (casa, departamento...)</option>
                     <option value="zone">Zona Geográfica (Yerba Buena, Barrio Norte...)</option>
                   </select>
@@ -2131,7 +2131,7 @@ export const AguadiCabinetView: React.FC = () => {
                       disabled={submitting}
                       className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl text-xs font-bold hover:opacity-95 shadow-md shadow-teal-500/10 cursor-pointer"
                     >
-                      Grabar Configuración de Widget
+                      Grabar configuración de Widget
                     </button>
                   </div>
                 </form>
@@ -2297,7 +2297,7 @@ export const AguadiCabinetView: React.FC = () => {
 
           {/* Integration variables / Credentials (4 cols) */}
           <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-100 p-6 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-4">
-            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Credenciales & Configuración Cloud</h2>
+            <h2 className="text-xs font-black font-mono tracking-wider text-slate-400 uppercase">Credenciales & configuración Cloud</h2>
             <p className="text-slate-400 text-xs font-medium leading-normal">
               Estado de las variables de entorno inyectadas en Cloud. La plataforma gestiona las claves de forma segura tras bambalinas.
             </p>
@@ -2365,3 +2365,4 @@ export const AguadiCabinetView: React.FC = () => {
     </div>
   );
 };
+

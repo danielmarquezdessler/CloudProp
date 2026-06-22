@@ -811,7 +811,7 @@ export const PropertiesView: React.FC = () => {
 
               {/* Description */}
               <div className="space-y-1">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Descripción del Inmueble</h4>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">descripción del Inmueble</h4>
                 <p className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
                   {selectedProperty.description}
                 </p>
@@ -855,7 +855,7 @@ export const PropertiesView: React.FC = () => {
       <ConfirmModal 
         isOpen={deletePropId !== null}
         title="¿Eliminar Propiedad?"
-        message="Esta acción es definitiva y eliminará permanentemente la oferta de propiedades de la base de datos corporativa. Se registrará en la auditoría técnica del servidor."
+        message="Esta acción es definitiva y eliminará permanentemente la oferta de propiedades de la base de datos corporativa. Se registrará en la Auditoría técnica del servidor."
         confirmText="Eliminar permanentemente"
         isDanger={true}
         isLoading={isDeleting}

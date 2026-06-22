@@ -237,7 +237,7 @@ export const UsersView: React.FC = () => {
         setIsFormOpen(false);
         loadUsers();
       } else {
-        setFormError(data.error || "Operación denegada.");
+        setFormError(data.error || "operación denegada.");
       }
     } catch (err: any) {
       setFormError(err.message || t.common.error);
