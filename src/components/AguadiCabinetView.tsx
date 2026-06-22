@@ -1207,7 +1207,7 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    🏠 Comprador Interesado
+                    Comprador interesado
                   </button>
                   <button
                     onClick={() => {
@@ -1227,7 +1227,7 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    💼 Propietario Vendedor
+                    Propietario vendedor
                   </button>
                   <button
                     onClick={() => {
@@ -1237,7 +1237,7 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    🔑 Propietario Locador
+                    Propietario locador
                   </button>
                   <button
                     onClick={() => {
@@ -1247,7 +1247,7 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    📈 Inversor
+                    Inversor
                   </button>
                   <button
                     onClick={() => {
@@ -1257,12 +1257,12 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="p-2 bg-slate-50 border border-slate-100 rounded-xl font-semibold hover:border-teal-500 transition cursor-pointer text-left truncate dark:bg-slate-850 dark:border-slate-800"
                   >
-                    ❓ Consulta General
+                    Consulta General
                   </button>
                 </div>
 
                 <p className="bg-amber-500/5 text-amber-600 border border-amber-500/15 p-2 rounded-2xl text-[9.5px] leading-relaxed font-sans">
-                  ⚠️ <strong>Aviso:</strong> El simulador se comunicará con Gemini cuando el backend seguro de Cloud y las variables de entornos queden completamente enlazadas.
+                  <strong>Aviso:</strong> El simulador se comunicará con Gemini cuando el backend seguro de Cloud y las variables de entornos queden completamente enlazadas.
                 </p>
               </div>
 
@@ -1452,7 +1452,7 @@ export const AguadiCabinetView: React.FC = () => {
                     }}
                     className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] font-bold tracking-tight font-mono transition uppercase cursor-pointer dark:bg-slate-800 dark:text-slate-350 dark:hover:bg-slate-700"
                   >
-                    🎲 Cargar Aleatorio
+                    Cargar aleatorio
                   </button>
                 </div>
               </div>
@@ -1586,7 +1586,7 @@ export const AguadiCabinetView: React.FC = () => {
           {leads.length === 0 ? (
             <div className="p-12 text-center text-slate-400 border border-dashed border-slate-100 rounded-3xl dark:border-slate-800">
               <Bot className="w-12 h-12 text-slate-300 mx-auto opacity-40 mb-3" />
-              <p className="text-sm font-semibold uppercase tracking-wider font-mono">No hay leads capturados en esta ventana bilingüe</p>
+              <p className="text-sm font-semibold uppercase tracking-wider font-mono">No hay leads capturados en esta ventana</p>
               <p className="text-xs text-slate-400 mt-2">Visita el simulador para ingresar interacciones piloto que Gemini clasificará de forma analítica en Firestore.</p>
             </div>
           ) : (
@@ -1688,7 +1688,7 @@ export const AguadiCabinetView: React.FC = () => {
                     placeholder="Ej: Terrenos Yerba Buena"
                     value={newRuleName}
                     onChange={(e) => setNewRuleName(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-8次 dark:bg-slate-800"
+                    className="w-full px-3 py-1.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-slate-800 dark:bg-slate-800"
                   />
                 </div>
                 <div>

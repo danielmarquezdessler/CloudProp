@@ -1,20 +1,21 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Building2, 
-  Users, 
-  History, 
-  LogOut, 
-  FileText, 
-  Globe2,
-  Menu,
-  X,
-  Plus,
-  Database,
-  Bot
+import {
+  Activity,
+  Bot,
+  Brain,
+  Building2,
+  History,
+  LogOut,
+  Megaphone,
+  Radar,
+  Route,
+  Sparkles,
+  Target,
+  Users,
+  X
 } from 'lucide-react';
-import { Language } from '../i18n';
-import { AGUADI_ZAP_PERMISSIONS } from '../../shared/aguadiZap';
+import logoUrl from '../assets/facundo-aguad-logo.svg';
 
 interface SidebarProps {
   currentTab: string;
@@ -23,204 +24,106 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
-  currentTab, 
+const navItems = [
+  { key: 'dashboard', label: 'Dashboard', icon: Building2, roles: ['super_admin', 'agent', 'client'] },
+  { key: 'aguadi', label: 'AGUADI ZAP', icon: Bot, roles: ['super_admin', 'agent'] },
+  { key: 'properties', label: 'Captador propietarios', icon: Route, roles: ['super_admin', 'agent', 'client'] },
+  { key: 'leads', label: 'Seguimiento de leads', icon: Activity, roles: ['super_admin', 'agent'] },
+  { key: 'crm', label: 'CRM Inteligente', icon: Brain, roles: ['super_admin', 'agent'] },
+  { key: 'matching', label: 'Matching Inteligente', icon: Sparkles, roles: ['super_admin', 'agent'] },
+  { key: 'campaigns', label: 'Campañas WhatsApp', icon: Megaphone, roles: ['super_admin', 'agent'] },
+  { key: 'radar', label: 'Radar de Intención', icon: Radar, roles: ['super_admin', 'agent'] },
+  { key: 'closing', label: 'Motor de cierre', icon: Target, roles: ['super_admin', 'agent'] },
+  { key: 'users', label: 'Usuarios y permisos', icon: Users, roles: ['super_admin'] },
+  { key: 'audit', label: 'Auditoría', icon: History, roles: ['super_admin'] }
+];
+
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentTab,
   setCurrentTab,
   isOpen = false,
   onClose
 }) => {
-  const { user, logout, language, changeLanguage, t } = useAuth();
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
   const handleTabChange = (tab: string) => {
-    setCurrentTab(tab);
+    const implementedTab = ['dashboard', 'properties', 'aguadi', 'users', 'audit'].includes(tab) ? tab : 'dashboard';
+    setCurrentTab(implementedTab);
     if (onClose) onClose();
   };
 
-  const menuItems = [
-    {
-      key: 'dashboard',
-      label: t.navigation.dashboard,
-      icon: Building2,
-      roles: ['super_admin', 'agent', 'client']
-    },
-    {
-      key: 'properties',
-      label: t.navigation.properties,
-      icon: FileText,
-      roles: ['super_admin', 'agent', 'client']
-    },
-    {
-      key: 'aguadi',
-      label: 'AGUADI ZAP',
-      icon: Bot,
-      roles: ['super_admin', 'agent']
-    },
-    {
-      key: 'users',
-      label: t.navigation.users,
-      icon: Users,
-      roles: ['super_admin'] // Protected, only super_admin can see
-    },
-    {
-      key: 'audit',
-      label: t.navigation.audit,
-      icon: History,
-      roles: ['super_admin'] // Protected, only super_admin can see
-    },
-    {
-      key: 'firebase-admin',
-      label: 'Firebase Suite',
-      icon: Database,
-      roles: ['super_admin', 'agent'] // Protected, only super_admin and agent can see
-    }
-  ];
-
-  // Helper to translate roles cleanly for the UI - (Rule 10)
-  const getDisplayRoleName = (roleKey: string) => {
-    switch(roleKey) {
-      case 'super_admin': return t.users.roles.super_admin;
-      case 'agent': return t.users.roles.agent;
-      case 'client': return t.users.roles.client;
-      default: return roleKey;
-    }
-  };
-
   return (
-    <aside 
-      className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 text-slate-100 flex flex-col justify-between border-r border-slate-900 transition-all duration-300 md:static md:translate-x-0 ${
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col bg-[#06487c] text-white transition-transform duration-300 md:static md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
       id="app-sidebar"
     >
-      <div className="flex flex-col flex-1 min-h-0">
-        {/* Header */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-900 bg-slate-950">
-          <div className="flex items-center space-x-2.5">
-            <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl text-teal-400">
-              <Building2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-sm font-black tracking-tight text-white leading-tight">
-                CloudProp AI Hub
-              </h1>
-              <span className="text-[10px] text-teal-400 font-bold font-mono tracking-wider block -mt-0.5">
-                FACUNDO AGUAD / v2.0
-              </span>
-            </div>
-          </div>
-          {onClose && (
-            <button 
-              onClick={onClose} 
-              className="md:hidden p-1.5 rounded-lg hover:bg-slate-900 text-slate-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+      <div className="border-b border-white/10 px-3 pb-5 pt-2">
+        <div className="flex h-[55px] items-center justify-center rounded-lg bg-white shadow-sm">
+          <img src={logoUrl} alt="Facundo Aguad" className="h-9 w-[170px] object-contain" />
         </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs font-black uppercase tracking-wide text-[#00dcd5]">CloudProp</p>
+          <p className="text-[10px] font-medium uppercase tracking-wide text-white">Suite</p>
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-3 top-3 rounded-md p-1.5 text-white/70 hover:bg-white/10 hover:text-white md:hidden"
+            aria-label="Cerrar navegación"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
+      </div>
 
-        {/* Navigation Items */}
-        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-          {menuItems.map((item) => {
+      <nav className="min-h-0 flex-1 overflow-y-auto px-2 py-4">
+        <p className="mb-2 px-2 text-xs font-medium text-white/58">Módulos</p>
+        <div className="space-y-1">
+          {navItems.map((item) => {
             let hasPermission = item.roles.includes(user.role);
-
-            // Respect precise permission directives for AGUADI ZAP conversion module.
             if (item.key === 'aguadi') {
-              hasPermission = 
-                user.role === 'super_admin' || 
-                (user.permissions && user.permissions.includes('*')) || 
-                (user.permissions && user.permissions.includes(AGUADI_ZAP_PERMISSIONS.legacyView)) ||
-                (user.permissions && user.permissions.includes(AGUADI_ZAP_PERMISSIONS.view));
+              hasPermission =
+                user.role === 'super_admin' ||
+                user.permissions?.includes('*') ||
+                user.permissions?.includes('aguadi.view');
             }
-
             if (!hasPermission) return null;
-
-            const IconComponent = item.icon;
-            const isActive = currentTab === item.key;
+            const Icon = item.icon;
+            const isActive = currentTab === item.key || (!['dashboard', 'properties', 'aguadi', 'users', 'audit'].includes(item.key) && currentTab === 'dashboard');
 
             return (
               <button
                 key={item.key}
+                type="button"
                 onClick={() => handleTabChange(item.key)}
-                className={`w-full px-4 py-3 rounded-xl text-sm font-semibold flex items-center space-x-3 transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg shadow-teal-500/10'
-                    : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                className={`flex h-8 w-full items-center gap-3 rounded-md px-2 text-left text-sm font-bold transition ${
+                  isActive ? 'bg-[#003d70] text-white' : 'text-white hover:bg-white/10'
                 }`}
                 id={`sidebar-link-${item.key}`}
               >
-                <IconComponent className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'}`} />
-                <span>{item.label}</span>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}
-        </nav>
-      </div>
-
-      {/* Footer / User Profile & Language Switcher */}
-      <div className="p-4 border-t border-slate-900 space-y-4">
-        {/* Language selector */}
-        <div>
-          <div className="flex items-center space-x-2 px-2 pb-2">
-            <Globe2 className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-              IDIOMA / LANG
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-1 p-1 bg-slate-900 rounded-lg text-xs font-medium">
-            <button
-              onClick={() => changeLanguage('es')}
-              className={`py-1.5 rounded-md text-center transition-all ${
-                language === 'es' ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              ES
-            </button>
-            <button
-              onClick={() => changeLanguage('en')}
-              className={`py-1.5 rounded-md text-center transition-all ${
-                language === 'en' ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => changeLanguage('pt-BR')}
-              className={`py-1.5 rounded-md text-center transition-all ${
-                language === 'pt-BR' ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              PT
-            </button>
-          </div>
         </div>
+      </nav>
 
-        {/* User Card */}
-        <div className="bg-slate-900/60 border border-slate-900 rounded-xl p-3 flex items-center justify-between">
-          <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-teal-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm select-none shadow-md shadow-emerald-500/10 shrink-0">
-              {user.displayName.charAt(0).toUpperCase()}
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-bold text-white truncate leading-tight">
-                {user.displayName}
-              </p>
-              <p className="text-[10px] font-semibold text-teal-400 uppercase mt-0.5 tracking-wider truncate">
-                {getDisplayRoleName(user.role)}
-              </p>
-            </div>
-          </div>
-          <button 
-            type="button"
-            onClick={logout}
-            className="p-1.5 rounded-lg hover:bg-rose-950/20 text-slate-500 hover:text-rose-400 transition-colors"
-            title={t.navigation.logout}
-            id="btn-logout"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
+      <div className="border-t border-white/12 p-3">
+        <button
+          type="button"
+          onClick={logout}
+          className="flex h-9 w-full items-center gap-3 rounded-md px-2 text-sm font-bold text-white transition hover:bg-white/10"
+          id="btn-logout"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     </aside>
   );

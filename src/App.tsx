@@ -8,11 +8,10 @@ import { UsersView } from './components/UsersView';
 import { AuditLogsView } from './components/AuditLogsView';
 import { FirebaseAdminView } from './components/FirebaseAdminView';
 import { AguadiCabinetView } from './components/AguadiCabinetView';
-import { Building2, Lock, Mail, AlertCircle, Globe, ChevronRight } from 'lucide-react';
-import { Language } from './i18n';
+import { Building2, Lock, Mail, AlertCircle } from 'lucide-react';
 
 function AppContent() {
-  const { user, login, loginWithGoogle, loading, error, language, changeLanguage, t } = useAuth();
+  const { user, login, loading, error, t } = useAuth();
   
   // Tab Routing State (with deep link support for /super-admin/aguadi)
   const [currentTab, setCurrentTab] = useState<string>(() => {
@@ -75,7 +74,7 @@ function AppContent() {
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 dark:bg-slate-950/60" id="login-layout">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 p-8 space-y-6 dark:bg-slate-900 dark:border-slate-800">
           
-          {/* Header & Trilingual Switcher */}
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="bg-teal-500/10 p-2 rounded-xl text-teal-600">
@@ -84,27 +83,6 @@ function AppContent() {
               <span className="text-xs font-bold font-mono tracking-wider text-slate-400">
                 AGUAD SUITE
               </span>
-            </div>
-            
-            <div className="flex bg-slate-100 p-1 rounded-lg text-[10px] font-bold">
-              <button 
-                onClick={() => changeLanguage('es')} 
-                className={`px-2 py-1 rounded transition ${language === 'es' ? 'bg-white text-teal-500 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                ES
-              </button>
-              <button 
-                onClick={() => changeLanguage('en')} 
-                className={`px-2 py-1 rounded transition ${language === 'en' ? 'bg-white text-teal-500 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                EN
-              </button>
-              <button 
-                onClick={() => changeLanguage('pt-BR')} 
-                className={`px-2 py-1 rounded transition ${language === 'pt-BR' ? 'bg-white text-teal-500 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                PT
-              </button>
             </div>
           </div>
 

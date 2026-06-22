@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { Language, Translations, dictionary } from '../i18n';
+import { APP_TEXT, AppText } from '../appText';
 import { db, auth } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -10,9 +10,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  language: Language;
-  t: Translations;
-  changeLanguage: (lang: Language) => void;
+  t: AppText;
   login: (email: string, passwordString: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
@@ -27,13 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Choose default language 'es' as instructed
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('aguad_cloudprop_lang');
-    return (saved as Language) || 'es';
-  });
-
-  const t = dictionary[language];
+  const t = APP_TEXT;
 
   // Auth synchronization with Firebase onAuthStateChanged
   useEffect(() => {
@@ -110,11 +102,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     return () => unsubscribe();
   }, []);
-
-  const changeLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('aguad_cloudprop_lang', lang);
-  };
 
   // Base persistent auth proxy fetch
   const apiFetch = async (url: string, options: RequestInit = {}) => {
@@ -226,9 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       loading,
       error,
-      language,
       t,
-      changeLanguage,
       login,
       loginWithGoogle,
       logout,
