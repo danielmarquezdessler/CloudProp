@@ -95,6 +95,37 @@ export interface AguadiConversation {
   updatedAt: string;
 }
 
+export interface AguadiAttentionConversation {
+  id: string;
+  orgId: string;
+  customerName: string;
+  customerPhone: string;
+  channel: 'whatsapp' | 'widget' | 'manual';
+  status: 'pending' | 'bot_active' | 'assigned' | 'closed';
+  assignedAgentId?: string;
+  assignedAgentName?: string;
+  lastMessage?: string;
+  lastMessageAt?: string;
+  unreadCount?: number;
+  leadScore?: number;
+  intent?: string;
+  source?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AguadiAttentionMessage {
+  id: string;
+  conversationId: string;
+  orgId: string;
+  direction: 'inbound' | 'outbound' | 'system';
+  senderType: 'customer' | 'bot' | 'agent' | 'system';
+  text: string;
+  createdAt: string;
+  whatsappMessageId?: string;
+  widgetSessionId?: string;
+}
+
 export interface AguadiMessage {
   messageId: string;
   conversationId: string;
