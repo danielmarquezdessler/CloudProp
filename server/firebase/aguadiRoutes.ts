@@ -15,7 +15,6 @@ import {
 
 const router = Router();
 const AGUADI_COLLECTIONS = LEGACY_AGUADI_COLLECTIONS;
-void AGUADI_ZAP_COLLECTIONS;
 
 const requireProfileOrgId = (profile: any): string => {
   const orgId = profile?.orgId;
@@ -56,6 +55,50 @@ const requireAguadiStaff = async (req: any, res: any, next: any) => {
   } catch (error: any) {
     return res.status(500).json({ success: false, error: "Error de autorización de AGUADI: " + error.message });
   }
+};
+
+const normalizeAttentionStatus = (status: string | undefined) => {
+  if (status === "pending" || status === "bot_active" || status === "assigned" || status === "closed") {
+    return status;
+  }
+  if (status === "active" || status === "open") return "bot_active";
+  if (status === "routed_to_agent") return "assigned";
+  return "pending";
+};
+
+const normalizeAttentionChannel = (channel: string | undefined) => {
+  if (channel === "whatsapp" || channel === "widget" || channel === "manual") {
+    return channel;
+  }
+  return "manual";
+};
+
+const toAttentionCenterItem = (doc: any) => {
+  const data = doc.data() || {};
+  return {
+    id: data.id || data.conversationId || doc.id,
+    orgId: data.orgId || "",
+    customerName: data.customerName || data.contactName || "Sin nombre registrado",
+    customerPhone: data.customerPhone || data.contactPhone || "",
+    channel: normalizeAttentionChannel(data.channel),
+    status: normalizeAttentionStatus(data.status),
+    assignedAgentId: data.assignedAgentId || "",
+    assignedAgentName: data.assignedAgentName || "",
+    lastMessage: data.lastMessage || data.lastMessageText || "",
+    lastMessageAt: data.lastMessageAt || data.updatedAt || data.createdAt || "",
+    unreadCount: Number(data.unreadCount) || 0,
+    leadScore: Number(data.leadScore ?? data.score) || 0,
+    intent: data.intent || data.operationType || "",
+    source: data.source || data.channel || "",
+    createdAt: data.createdAt || "",
+    updatedAt: data.updatedAt || ""
+  };
+};
+
+const sortByLastActivityDesc = (a: any, b: any) => {
+  const left = new Date(a.lastMessageAt || a.updatedAt || a.createdAt || 0).getTime();
+  const right = new Date(b.lastMessageAt || b.updatedAt || b.createdAt || 0).getTime();
+  return right - left;
 };
 
 /**
@@ -248,7 +291,33 @@ router.post("/aguadi/widget-config", requireAguadiStaff, async (req: any, res) =
 });
 
 /**
- * 8. GET Conversations list (filtered by multitenant org)
+ * 8. GET Attention Center inbox (future AGUADI ZAP collection, read-only)
+ */
+router.get("/aguadi/attention-center", requireAguadiStaff, async (req: any, res) => {
+  const db = getFirestoreAdmin();
+
+  try {
+    const orgId = requireProfileOrgId(req.callerProfile);
+    const snap = await db.collection(AGUADI_ZAP_COLLECTIONS.conversations)
+      .where("orgId", "==", orgId)
+      .get();
+
+    const items: any[] = [];
+    snap.forEach((doc: any) => items.push(toAttentionCenterItem(doc)));
+    items.sort(sortByLastActivityDesc);
+
+    res.json({
+      success: true,
+      items,
+      total: items.length
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * 9. GET Conversations list (filtered by multitenant org)
  */
 router.get("/aguadi/conversations", requireAguadiStaff, async (req: any, res) => {
   const db = getFirestoreAdmin();
@@ -257,11 +326,11 @@ router.get("/aguadi/conversations", requireAguadiStaff, async (req: any, res) =>
     const orgId = requireProfileOrgId(req.callerProfile);
     const snap = await db.collection(AGUADI_COLLECTIONS.conversations)
       .where('orgId', '==', orgId)
-      .orderBy('lastMessageAt', 'desc')
       .get();
 
     const conversations: any[] = [];
     snap.forEach((doc: any) => conversations.push(doc.data()));
+    conversations.sort(sortByLastActivityDesc);
 
     res.json({ success: true, conversations });
   } catch (error: any) {

@@ -34,6 +34,7 @@ import {
   AguadiConversation, 
   AguadiMessage, 
   AguadiLead, 
+  AguadiAttentionConversation,
   AguadiWidgetConfig, 
   AguadiRoutingRule, 
   AguadiTrainingRule, 
@@ -42,11 +43,16 @@ import {
 } from '../types';
 import { AGUADI_ZAP_DISPLAY_NAME, AGUADI_ZAP_MODULE_NAME } from '../../shared/aguadiZap';
 
+type AguadiCabinetTab = 'dashboard' | 'attention' | 'simulator' | 'leads' | 'rules' | 'widget' | 'telemetry';
+type AttentionFilter = 'all' | 'pending' | 'bot_active' | 'assigned' | 'closed';
+
+const SIMULATOR_UNAVAILABLE_MESSAGE = "El simulador de AGUADI ZAP se activará cuando el motor Gemini esté configurado desde backend seguro.";
+
 export const AguadiCabinetView: React.FC = () => {
   const { user } = useAuth();
   
   // Dashboard Tabs
-  const [activeTab, setActiveTab] = useState<'simulator' | 'leads' | 'rules' | 'widget' | 'telemetry'>('simulator');
+  const [activeTab, setActiveTab] = useState<AguadiCabinetTab>('dashboard');
 
   // AGUADI ZAP Configuration States
   const [settings, setSettings] = useState<AguadiSettings | null>(null);
@@ -59,6 +65,9 @@ export const AguadiCabinetView: React.FC = () => {
   const [conversations, setConversations] = useState<AguadiConversation[]>([]);
   const [messages, setMessages] = useState<AguadiMessage[]>([]);
   const [leads, setLeads] = useState<AguadiLead[]>([]);
+  const [attentionItems, setAttentionItems] = useState<AguadiAttentionConversation[]>([]);
+  const [attentionFilter, setAttentionFilter] = useState<AttentionFilter>('all');
+  const [selectedAttentionItem, setSelectedAttentionItem] = useState<AguadiAttentionConversation | null>(null);
   
   const [telemetryEvents, setTelemetryEvents] = useState<AguadiEvent[]>([]);
   const [metricsSummary, setMetricsSummary] = useState<any>(null);
@@ -127,14 +136,25 @@ export const AguadiCabinetView: React.FC = () => {
         }
       }
 
-      // 3. Fetch leads
+      // 3. Fetch attention center inbox
+      const attentionRes = await fetch('/api/aguadi/attention-center', { headers });
+      const attentionData = await attentionRes.json();
+      if (attentionData.success) {
+        const items = attentionData.items || [];
+        setAttentionItems(items);
+        if (items.length > 0 && !selectedAttentionItem) {
+          setSelectedAttentionItem(items[0]);
+        }
+      }
+
+      // 4. Fetch leads
       const leadsRes = await fetch('/api/aguadi/leads', { headers });
       const leadsData = await leadsRes.json();
       if (leadsData.success) {
         setLeads(leadsData.leads || []);
       }
 
-      // 4. Fetch telemetry metrics
+      // 5. Fetch telemetry metrics
       const metricsRes = await fetch('/api/aguadi/metrics', { headers });
       const metricsData = await metricsRes.json();
       if (metricsData.success) {
@@ -288,10 +308,12 @@ export const AguadiCabinetView: React.FC = () => {
           });
         }
       } else {
-        alert("Error en el simulador: " + data.error);
+        console.warn("[AGUADI ZAP Simulator] Motor no disponible:", data.error);
+        alert(SIMULATOR_UNAVAILABLE_MESSAGE);
       }
     } catch (err: any) {
-      alert("Error del servidor: " + err.message);
+      console.warn("[AGUADI ZAP Simulator] Motor no disponible:", err);
+      alert(SIMULATOR_UNAVAILABLE_MESSAGE);
     } finally {
       setSubmitting(false);
     }
@@ -467,6 +489,56 @@ export const AguadiCabinetView: React.FC = () => {
   };
 
   const selectedLead = getSelectedLeadProfile();
+  const attentionFilters: { key: AttentionFilter; label: string }[] = [
+    { key: 'all', label: 'Todas' },
+    { key: 'pending', label: 'Pendientes' },
+    { key: 'bot_active', label: 'En atención' },
+    { key: 'assigned', label: 'Derivadas' },
+    { key: 'closed', label: 'Cerradas' }
+  ];
+  const filteredAttentionItems = attentionItems.filter((item) =>
+    attentionFilter === 'all' ? true : item.status === attentionFilter
+  );
+  const activeAttentionItem =
+    selectedAttentionItem && filteredAttentionItems.some((item) => item.id === selectedAttentionItem.id)
+      ? selectedAttentionItem
+      : filteredAttentionItems[0] || null;
+
+  const getAttentionStatusLabel = (status?: AguadiAttentionConversation['status']) => {
+    switch (status) {
+      case 'pending':
+        return 'Pendiente';
+      case 'bot_active':
+        return 'En atención';
+      case 'assigned':
+        return 'Derivada';
+      case 'closed':
+        return 'Cerrada';
+      default:
+        return 'Sin estado';
+    }
+  };
+
+  const getAttentionStatusClass = (status?: AguadiAttentionConversation['status']) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'bot_active':
+        return 'bg-teal-50 text-teal-600 border-teal-100';
+      case 'assigned':
+        return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+      case 'closed':
+        return 'bg-slate-100 text-slate-500 border-slate-200';
+      default:
+        return 'bg-slate-50 text-slate-500 border-slate-100';
+    }
+  };
+
+  const getAttentionChannelLabel = (channel?: AguadiAttentionConversation['channel']) => {
+    if (channel === 'whatsapp') return 'WhatsApp';
+    if (channel === 'widget') return 'Widget web';
+    return 'Manual';
+  };
 
   if (loading && conversations.length === 0) {
     return (
@@ -553,6 +625,18 @@ export const AguadiCabinetView: React.FC = () => {
           <span>Dashboard Principal</span>
         </button>
         <button
+          onClick={() => setActiveTab('attention')}
+          className={`px-4.5 py-3 text-xs font-bold tracking-tight rounded-t-xl transition-all border-b-2 flex items-center space-x-2 cursor-pointer ${
+            activeTab === 'attention'
+              ? 'border-teal-500 text-teal-600 dark:text-teal-400'
+              : 'border-transparent text-slate-400 hover:text-slate-700'
+          }`}
+          id="tab-btn-attention"
+        >
+          <UserCheck className="w-4 h-4" />
+          <span>Centro de Atención</span>
+        </button>
+        <button
           onClick={() => setActiveTab('simulator')}
           className={`px-4.5 py-3 text-xs font-bold tracking-tight rounded-t-xl transition-all border-b-2 flex items-center space-x-2 cursor-pointer ${
             activeTab === 'simulator' 
@@ -562,7 +646,7 @@ export const AguadiCabinetView: React.FC = () => {
           id="tab-btn-simulator"
         >
           <MessageSquare className="w-4 h-4" />
-          <span>Simulador & Conversaciones</span>
+          <span>Simulador</span>
         </button>
         <button
           onClick={() => setActiveTab('leads')}
@@ -653,11 +737,11 @@ export const AguadiCabinetView: React.FC = () => {
                 <span>Configurar Widget</span>
               </button>
               <button
-                onClick={() => setActiveTab('simulator')}
+                onClick={() => setActiveTab('attention')}
                 className="px-4.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
               >
                 <Star className="w-4 h-4 text-amber-400" />
-                <span>Ver Conversaciones</span>
+                <span>Centro de Atención</span>
               </button>
             </div>
           </div>
@@ -1312,6 +1396,190 @@ export const AguadiCabinetView: React.FC = () => {
 
           </div>
 
+        </div>
+      )}
+
+      {/* --- Tab 1: ATTENTION CENTER INBOX --- */}
+      {activeTab === 'attention' && (
+        <div className="space-y-5 animate-fade-in font-sans" id="attention-center-stage">
+          <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-black text-slate-950 dark:text-white tracking-tight">Centro de Atención</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Conversaciones derivadas por AGUADI ZAP desde WhatsApp y el widget web.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {attentionFilters.map((filter) => (
+                  <button
+                    key={filter.key}
+                    type="button"
+                    onClick={() => setAttentionFilter(filter.key)}
+                    className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition cursor-pointer ${
+                      attentionFilter === filter.key
+                        ? 'bg-teal-500 text-white border-teal-500 shadow-xs'
+                        : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-teal-200 hover:text-teal-600 dark:bg-slate-850 dark:border-slate-800'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {attentionItems.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-dashed border-slate-200 p-12 text-center shadow-xs dark:bg-slate-900 dark:border-slate-800">
+              <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight">Todavía no hay conversaciones en el Centro de Atención.</h3>
+              <p className="text-xs text-slate-400 mt-2 max-w-lg mx-auto leading-relaxed">
+                Cuando AGUADI ZAP derive consultas desde WhatsApp o el widget web, aparecerán en esta bandeja.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+              <div className="xl:col-span-3 bg-white rounded-3xl border border-slate-100 p-4 shadow-xs dark:bg-slate-900 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[10px] font-black font-mono uppercase tracking-wider text-slate-400">Conversaciones</h3>
+                  <span className="text-[10px] text-slate-400 font-mono">{filteredAttentionItems.length}</span>
+                </div>
+                <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                  {filteredAttentionItems.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl dark:border-slate-800">
+                      No hay conversaciones para este filtro.
+                    </div>
+                  ) : (
+                    filteredAttentionItems.map((item) => {
+                      const isSelected = activeAttentionItem?.id === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setSelectedAttentionItem(item)}
+                          className={`w-full text-left p-3 rounded-2xl border transition text-xs cursor-pointer ${
+                            isSelected
+                              ? 'bg-teal-500/5 border-teal-200 shadow-xs'
+                              : 'bg-slate-50/50 border-slate-100 hover:bg-slate-50 dark:bg-slate-800/20 dark:border-slate-800/30'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <strong className="text-slate-900 dark:text-white truncate">{item.customerName || 'Contacto sin nombre'}</strong>
+                            {(item.unreadCount || 0) > 0 && (
+                              <span className="min-w-5 h-5 px-1.5 rounded-full bg-teal-500 text-white text-[9px] font-black flex items-center justify-center">
+                                {item.unreadCount}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-mono mt-1 truncate">{item.customerPhone || 'Sin teléfono'}</p>
+                          <p className="text-[10px] text-slate-500 mt-2 truncate">{item.lastMessage || 'Sin último mensaje registrado'}</p>
+                          <div className="flex items-center justify-between mt-2.5">
+                            <span className={`px-2 py-0.5 rounded-full border text-[8px] font-bold uppercase ${getAttentionStatusClass(item.status)}`}>
+                              {getAttentionStatusLabel(item.status)}
+                            </span>
+                            <span className="text-[8px] text-slate-400 font-mono">
+                              {item.lastMessageAt ? new Date(item.lastMessageAt).toLocaleDateString() : 'Sin fecha'}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              <div className="xl:col-span-6 bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden dark:bg-slate-900 dark:border-slate-800 min-h-[520px] flex flex-col">
+                {activeAttentionItem ? (
+                  <>
+                    <div className="p-5 bg-slate-50/60 border-b border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-base font-black text-slate-950 dark:text-white">{activeAttentionItem.customerName || 'Contacto sin nombre'}</h3>
+                          <p className="text-xs text-slate-400 mt-1 font-mono">{activeAttentionItem.customerPhone || 'Sin teléfono registrado'}</p>
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full border text-[9px] font-bold uppercase ${getAttentionStatusClass(activeAttentionItem.status)}`}>
+                          {getAttentionStatusLabel(activeAttentionItem.status)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 p-6 flex flex-col justify-between gap-6">
+                      <div className="space-y-3">
+                        <span className="text-[10px] font-black font-mono uppercase tracking-wider text-slate-400">Último mensaje</span>
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                          <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                            {activeAttentionItem.lastMessage || 'Esta conversación todavía no tiene mensajes visibles en la bandeja.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Canal</span>
+                          <strong className="text-slate-900 dark:text-white">{getAttentionChannelLabel(activeAttentionItem.channel)}</strong>
+                        </div>
+                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Origen</span>
+                          <strong className="text-slate-900 dark:text-white">{activeAttentionItem.source || 'Sin origen declarado'}</strong>
+                        </div>
+                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Intención</span>
+                          <strong className="text-slate-900 dark:text-white">{activeAttentionItem.intent || 'Sin clasificar'}</strong>
+                        </div>
+                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Última actividad</span>
+                          <strong className="text-slate-900 dark:text-white">
+                            {activeAttentionItem.lastMessageAt ? new Date(activeAttentionItem.lastMessageAt).toLocaleString() : 'Sin fecha'}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center p-8 text-center text-slate-400">
+                    <div>
+                      <MessageSquare className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                      <p className="text-xs font-semibold">Seleccioná una conversación para ver el detalle.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="xl:col-span-3 bg-white rounded-3xl border border-slate-100 p-5 shadow-xs dark:bg-slate-900 dark:border-slate-800">
+                <h3 className="text-[10px] font-black font-mono uppercase tracking-wider text-slate-400 mb-4">Ficha del cliente / lead</h3>
+                {activeAttentionItem ? (
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Cliente</span>
+                      <strong className="text-slate-900 dark:text-white">{activeAttentionItem.customerName || 'Sin nombre'}</strong>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Teléfono</span>
+                      <strong className="text-slate-900 dark:text-white font-mono">{activeAttentionItem.customerPhone || 'Sin teléfono'}</strong>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Score lead</span>
+                      <strong className="text-teal-600 text-lg font-black">{activeAttentionItem.leadScore || 0}%</strong>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Agente asignado</span>
+                      <strong className="text-slate-900 dark:text-white">
+                        {activeAttentionItem.assignedAgentName || activeAttentionItem.assignedAgentId || 'Sin asignación'}
+                      </strong>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 dark:bg-slate-850 dark:border-slate-800">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block font-mono">Creada</span>
+                      <strong className="text-slate-900 dark:text-white">
+                        {activeAttentionItem.createdAt ? new Date(activeAttentionItem.createdAt).toLocaleDateString() : 'Sin fecha'}
+                      </strong>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 leading-relaxed">La ficha se completará cuando selecciones una conversación.</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
