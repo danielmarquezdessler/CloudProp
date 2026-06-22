@@ -1,4 +1,4 @@
-export interface Translations {
+export interface AppText {
   auth: {
     title: string;
     subtitle: string;
@@ -127,7 +127,7 @@ export interface Translations {
   };
 }
 
-export const t: Translations = {
+export const APP_TEXT: AppText = {
   auth: {
     title: "Aguad CloudProp",
     subtitle: "Suite de gestión inmobiliaria inteligente",

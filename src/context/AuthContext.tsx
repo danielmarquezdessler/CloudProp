@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { Translations, t as spanishArgentinaTranslations } from '../i18n';
+import { APP_TEXT, AppText } from '../appText';
 import { db, auth } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -10,7 +10,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  t: Translations;
+  t: AppText;
   login: (email: string, passwordString: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  const t = spanishArgentinaTranslations;
+  const t = APP_TEXT;
 
   // Auth synchronization with Firebase onAuthStateChanged
   useEffect(() => {
